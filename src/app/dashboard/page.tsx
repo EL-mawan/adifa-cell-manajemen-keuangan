@@ -28,7 +28,7 @@ import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/hooks/use-toast';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Link from 'next/link';
-import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface DashboardStats {
   totalBalance: { value: number; growth: number };
@@ -54,26 +54,43 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Date filter state
-  const [startDate, setStartDate] = useState(() => {
-    const date = new Date();
-    date.setDate(date.getDate() - 6);
-    return date.toISOString().split('T')[0];
-  });
-  const [endDate, setEndDate] = useState(() => {
-    return new Date().toISOString().split('T')[0];
-  });
+  // Month filter state
+  const currentMonth = new Date().getMonth(); // 0-11
+  const currentYear = new Date().getFullYear();
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth.toString());
 
-  const fetchStats = async (customStart?: string, customEnd?: string) => {
+  const months = [
+    { value: '0', label: 'Januari' },
+    { value: '1', label: 'Februari' },
+    { value: '2', label: 'Maret' },
+    { value: '3', label: 'April' },
+    { value: '4', label: 'Mei' },
+    { value: '5', label: 'Juni' },
+    { value: '6', label: 'Juli' },
+    { value: '7', label: 'Agustus' },
+    { value: '8', label: 'September' },
+    { value: '9', label: 'Oktober' },
+    { value: '10', label: 'November' },
+    { value: '11', label: 'Desember' },
+  ];
+
+  const fetchStats = async (customMonth?: string) => {
     try {
-      const start = customStart || startDate;
-      const end = customEnd || endDate;
+      const month = customMonth !== undefined ? customMonth : selectedMonth;
+      const year = currentYear;
       
-      const response = await fetch(`/api/dashboard/stats?startDate=${start}&endDate=${end}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // Calculate start and end date for the selected month
+      const startDate = new Date(year, parseInt(month), 1);
+      const endDate = new Date(year, parseInt(month) + 1, 0);
+      
+      const response = await fetch(
+        `/api/dashboard/stats?startDate=${startDate.toISOString().split('T')[0]}&endDate=${endDate.toISOString().split('T')[0]}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) throw new Error('Gagal mengambil data dashboard');
 
@@ -97,7 +114,7 @@ export default function DashboardPage() {
     const handleFocus = () => fetchStats();
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [token, startDate, endDate]);
+  }, [token, selectedMonth]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -256,25 +273,19 @@ export default function DashboardPage() {
             </CardHeader>
             <div className="px-4 pb-3">
               <div className="flex items-center gap-2">
-                <div className="flex-1 relative group">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
-                  <Input 
-                    type="date" 
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="pl-9 pr-3 rounded-full h-9 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-[10px] ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
-                  />
-                </div>
-                <span className="text-zinc-400 font-black text-[9px] uppercase tracking-tighter shrink-0">s.d</span>
-                <div className="flex-1 relative group">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
-                  <Input 
-                    type="date" 
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="pl-9 pr-3 rounded-full h-9 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-[10px] ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
-                  />
-                </div>
+                <Calendar className="h-4 w-4 text-zinc-400 shrink-0" />
+                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                  <SelectTrigger className="rounded-full h-9 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-xs ring-offset-white focus:ring-2 focus:ring-indigo-500 transition-all">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month) => (
+                      <SelectItem key={month.value} value={month.value} className="font-bold">
+                        {month.label} {currentYear}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <CardContent className="px-0 pb-2">

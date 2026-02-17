@@ -22,6 +22,7 @@ async function main() {
   });
   console.log('✅ Admin user created:', admin.email);
 
+  /*
   // Create Cashier User
   const cashierPassword = await bcrypt.hash('kasir123', 10);
   const cashier = await prisma.user.upsert({
@@ -37,6 +38,7 @@ async function main() {
     },
   });
   console.log('✅ Cashier user created:', cashier.email);
+  */
 
   // Create Suppliers
   const supplier1 = await prisma.supplier.upsert({

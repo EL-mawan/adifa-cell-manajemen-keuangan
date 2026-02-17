@@ -1,9 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import * as adapterModule from '@prisma/adapter-libsql'
 
-// Extract PrismaLibSQL from the module in a way that handles both ESM and CJS bundling
-const PrismaLibSQL = (adapterModule as any).PrismaLibSQL || (adapterModule as any).default?.PrismaLibSQL;
-
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
@@ -12,19 +9,42 @@ const globalForPrisma = globalThis as unknown as {
 const tursoUrl = process.env.TURSO_DATABASE_URL;
 const tursoToken = process.env.TURSO_AUTH_TOKEN;
 
+console.log('--- DB Initialization Debug ---');
+console.log('TURSO_DATABASE_URL present:', !!tursoUrl);
+console.log('TURSO_AUTH_TOKEN present:', !!tursoToken);
+console.log('Adapter Module keys:', Object.keys(adapterModule));
+
+// Find the constructor more reliably (handles ESM, CJS, and various bundlers)
+let constructorCandidate: any = (adapterModule as any).PrismaLibSQL;
+if (!constructorCandidate && (adapterModule as any).default) {
+  constructorCandidate = (adapterModule as any).default.PrismaLibSQL || (adapterModule as any).default;
+}
+// Handle nested exports if any
+if (constructorCandidate && constructorCandidate.PrismaLibSQL) {
+  constructorCandidate = constructorCandidate.PrismaLibSQL;
+}
+
+const PrismaLibSQL = constructorCandidate;
+console.log('PrismaLibSQL found:', typeof PrismaLibSQL === 'function');
+
 let adapter: any = null;
 
 if (typeof PrismaLibSQL === 'function' && tursoUrl) {
-  console.log('Initializing Prisma with LibSQL adapter (Turso)');
-  adapter = new PrismaLibSQL({
-    url: tursoUrl,
-    authToken: tursoToken,
-  })
+  try {
+    console.log('Attempting to create LibSQL adapter...');
+    adapter = new PrismaLibSQL({
+      url: tursoUrl,
+      authToken: tursoToken,
+    })
+    console.log('LibSQL adapter created successfully');
+  } catch (err: any) {
+    console.error('CRITICAL: Failed to create LibSQL adapter:', err.message);
+  }
 } else {
-  console.log('Prisma LibSQL adapter NOT initialized. Falling back to default URL or local SQLite.');
-  if (typeof PrismaLibSQL !== 'function') console.log('- PrismaLibSQL is not a function');
-  if (!tursoUrl) console.log('- TURSO_DATABASE_URL is missing');
+  const reason = !tursoUrl ? 'TURSO_DATABASE_URL is missing' : 'PrismaLibSQL constructor not found';
+  console.log(`Using fallback provider because: ${reason}`);
 }
+console.log('-------------------------------');
 
 export const db =
   globalForPrisma.prisma ??

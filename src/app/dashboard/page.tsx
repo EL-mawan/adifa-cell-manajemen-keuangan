@@ -209,7 +209,7 @@ export default function DashboardPage() {
             trendValue={stats?.totalBalance.growth ? `${Math.abs(stats.totalBalance.growth).toFixed(1)}%` : '0%'}
         />
         <StatCard 
-            title="Profit Hari Ini" 
+            title="Profit" 
             value={formatCurrency(stats?.todayProfit.value || 0)} 
             icon={DollarSign}
             colorClass="bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20"
@@ -225,7 +225,7 @@ export default function DashboardPage() {
             trendValue={stats?.todayTransactions.growth ? `${Math.abs(stats.todayTransactions.growth).toFixed(1)}%` : '0%'}
         />
         <StatCard 
-            title="Rata-rata Trx" 
+            title="Avg. Profit" 
             value={formatCurrency(stats?.todayAvg.value || 0)}
             icon={TrendingUp}
             colorClass="bg-rose-50 text-rose-600 dark:bg-rose-900/20"

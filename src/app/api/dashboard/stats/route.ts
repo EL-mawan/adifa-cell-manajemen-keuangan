@@ -23,83 +23,79 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Today and Yesterday date ranges
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
+    // Determine Date Range for Stats (Defaults to Today if no params)
+    let statsStart: Date;
+    let statsEnd: Date;
+    let prevStart: Date;
+    let prevEnd: Date;
 
-    const yesterdayStart = new Date();
-    yesterdayStart.setDate(yesterdayStart.getDate() - 1);
-    yesterdayStart.setHours(0, 0, 0, 0);
-    const yesterdayEnd = new Date();
-    yesterdayEnd.setDate(yesterdayEnd.getDate() - 1);
-    yesterdayEnd.setHours(23, 59, 59, 999);
+    if (startDateParam && endDateParam) {
+      statsStart = new Date(startDateParam);
+      statsEnd = new Date(endDateParam);
+      statsEnd.setHours(23, 59, 59, 999);
+      
+      // Calculate previous period (same duration)
+      const duration = statsEnd.getTime() - statsStart.getTime();
+      prevEnd = new Date(statsStart.getTime() - 1);
+      prevStart = new Date(prevEnd.getTime() - duration);
+    } else {
+      statsStart = new Date();
+      statsStart.setHours(0, 0, 0, 0);
+      statsEnd = new Date();
+      statsEnd.setHours(23, 59, 59, 999);
+      
+      prevStart = new Date(statsStart);
+      prevStart.setDate(prevStart.getDate() - 1);
+      prevEnd = new Date(statsEnd);
+      prevEnd.setDate(prevEnd.getDate() - 1);
+    }
 
     const isKasir = auth.user.role === 'KASIR';
     const userId = auth.user.userId;
 
-    // Balance Stats
+    // Balance Stats (Current Balance is always absolute, not ranged)
     let currentTotalBalance = 0;
-    let todayNetMutation = 0;
-
+    
+    // Calculate Net Mutation for the Period (optional if we just want current balance)
+    // For specific period stats, we usually show Profit and Transaction Count
+    
     if (isKasir) {
       const user = await db.user.findUnique({
         where: { id: userId },
         select: { balance: true }
       });
       currentTotalBalance = user?.balance || 0;
-
-      const balanceLogsToday = await db.balanceLog.findMany({
-        where: { 
-          createdAt: { gte: todayStart },
-          userId: userId
-        }
-      });
-      balanceLogsToday.forEach(log => {
-        if (log.type === 'TOP_UP' || log.type === 'REFUND') todayNetMutation += log.amount;
-        else todayNetMutation -= log.amount;
-      });
     } else {
-      // Admin sees aggregate
       const users = await db.user.findMany({ select: { balance: true } });
       currentTotalBalance = users.reduce((sum, u) => sum + u.balance, 0);
-
-      const balanceLogsToday = await db.balanceLog.findMany({
-        where: { createdAt: { gte: todayStart } }
-      });
-      balanceLogsToday.forEach(log => {
-        if (log.type === 'TOP_UP' || log.type === 'REFUND') todayNetMutation += log.amount;
-        else todayNetMutation -= log.amount;
-      });
     }
 
-    const yesterdayTotalBalance = currentTotalBalance - todayNetMutation;
-
-    // Today's and Yesterday's transactions
-    const [todayTxs, yesterdayTxs] = await Promise.all([
+    // Fetch Transactions for Current Period and Previous Period
+    const [currentPeriodTxs, prevPeriodTxs] = await Promise.all([
       db.transaction.findMany({ 
         where: { 
-          createdAt: { gte: todayStart, lte: todayEnd },
+          createdAt: { gte: statsStart, lte: statsEnd },
+          status: 'SUCCESS', // Only count success transactions
           ...(isKasir ? { userId } : {})
         } 
       }),
       db.transaction.findMany({ 
         where: { 
-          createdAt: { gte: yesterdayStart, lte: yesterdayEnd },
+          createdAt: { gte: prevStart, lte: prevEnd },
+          status: 'SUCCESS', // Only count success transactions
           ...(isKasir ? { userId } : {})
         } 
       })
     ]);
 
-    const todayProfit = todayTxs.reduce((sum, tx) => sum + tx.profit, 0);
-    const yesterdayProfit = yesterdayTxs.reduce((sum, tx) => sum + tx.profit, 0);
+    const currentProfit = currentPeriodTxs.reduce((sum, tx) => sum + tx.profit, 0);
+    const prevProfit = prevPeriodTxs.reduce((sum, tx) => sum + tx.profit, 0);
     
-    const todayCount = todayTxs.length;
-    const yesterdayCount = yesterdayTxs.length;
+    const currentCount = currentPeriodTxs.length;
+    const prevCount = prevPeriodTxs.length;
 
-    const todayAvg = todayCount > 0 ? todayProfit / todayCount : 0;
-    const yesterdayAvg = yesterdayCount > 0 ? yesterdayProfit / yesterdayCount : 0;
+    const currentAvg = currentCount > 0 ? currentProfit / currentCount : 0;
+    const prevAvg = prevCount > 0 ? prevProfit / prevCount : 0;
 
     // Helper to calculate percentage growth
     const calculateGrowth = (current: number, previous: number) => {
@@ -111,21 +107,23 @@ export async function GET(request: NextRequest) {
     const stats = {
       totalBalance: {
         value: currentTotalBalance,
-        growth: calculateGrowth(currentTotalBalance, yesterdayTotalBalance)
+        growth: 0 // Balance growth logic is complex without daily snapshots, simpler to omit or use diff logic if needed
       },
-      todayTransactions: {
-        value: todayCount,
-        growth: calculateGrowth(todayCount, yesterdayCount)
+      todayTransactions: { // Keeping key name for frontend compatibility, but it represents period
+        value: currentCount,
+        growth: calculateGrowth(currentCount, prevCount)
       },
-      todayProfit: {
-        value: todayProfit,
-        growth: calculateGrowth(todayProfit, yesterdayProfit)
+      todayProfit: { // Keeping key name for frontend compatibility, but it represents period
+        value: currentProfit,
+        growth: calculateGrowth(currentProfit, prevProfit)
       },
-      todayAvg: {
-        value: todayAvg,
-        growth: calculateGrowth(todayAvg, yesterdayAvg)
+      todayAvg: { // Keeping key name for frontend compatibility, but it represents period
+        value: currentAvg,
+        growth: calculateGrowth(currentAvg, prevAvg)
       }
     };
+
+    // Chart data setup (reusing logic below)
 
     // Chart data - use custom date range if provided, otherwise last 7 days
     let chartStartDate: Date;

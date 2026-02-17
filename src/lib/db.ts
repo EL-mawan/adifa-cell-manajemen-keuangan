@@ -15,10 +15,15 @@ const tursoToken = process.env.TURSO_AUTH_TOKEN;
 let adapter: any = null;
 
 if (typeof PrismaLibSQL === 'function' && tursoUrl) {
+  console.log('Initializing Prisma with LibSQL adapter (Turso)');
   adapter = new PrismaLibSQL({
     url: tursoUrl,
     authToken: tursoToken,
   })
+} else {
+  console.log('Prisma LibSQL adapter NOT initialized. Falling back to default URL or local SQLite.');
+  if (typeof PrismaLibSQL !== 'function') console.log('- PrismaLibSQL is not a function');
+  if (!tursoUrl) console.log('- TURSO_DATABASE_URL is missing');
 }
 
 export const db =

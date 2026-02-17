@@ -90,6 +90,15 @@ export default function UsersPage() {
   };
 
   const handleEdit = (user: UserData) => {
+    if (user.email === 'admin@adifacell.com') {
+      toast({
+        title: 'Akses Dibatasi',
+        description: 'Akun Administrator Utama tidak dapat diubah melalui menu ini.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setFormData({
         name: user.name,
         email: user.email,
@@ -386,9 +395,16 @@ export default function UsersPage() {
                                     <TableCell className="text-zinc-600 dark:text-zinc-400">{u.email}</TableCell>
                                     <TableCell className="text-zinc-900 dark:text-zinc-100 font-medium">{formatCurrency(u.balance)}</TableCell>
                                     <TableCell>
-                                        <Badge variant="secondary" className={`rounded-full px-3 font-normal ${u.isActive ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                                            {u.isActive ? 'Active' : 'Inactive'}
-                                        </Badge>
+                                        <div className="flex items-center gap-2">
+                                          <Badge variant="secondary" className={`rounded-full px-3 font-normal ${u.isActive ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
+                                              {u.isActive ? 'Active' : 'Inactive'}
+                                          </Badge>
+                                          {u.email === 'admin@adifacell.com' && (
+                                            <div className="text-zinc-400" title="Akun Terkunci">
+                                              <Edit className="h-3 w-3 opacity-20" />
+                                            </div>
+                                          )}
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))

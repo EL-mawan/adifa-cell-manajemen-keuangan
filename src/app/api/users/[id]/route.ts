@@ -28,6 +28,11 @@ export async function PATCH(
         return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 });
     }
 
+    // Lock CRUD for Super Admin
+    if (existingUser.email === 'admin@adifacell.com') {
+      return NextResponse.json({ error: 'Akun Administrator Utama tidak dapat diubah' }, { status: 403 });
+    }
+
     const updateData: any = {
         name: name || undefined,
         email: email || undefined,
@@ -89,6 +94,16 @@ export async function DELETE(
     const existingUser = await db.user.findUnique({ where: { id } });
     if (!existingUser) {
         return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 });
+    }
+
+    // Lock CRUD for Super Admin
+    if (existingUser.email === 'admin@adifacell.com') {
+      return NextResponse.json({ error: 'Akun Administrator Utama tidak dapat dihapus' }, { status: 403 });
+    }
+
+    // Lock CRUD for Super Admin
+    if (existingUser.email === 'admin@adifacell.com') {
+      return NextResponse.json({ error: 'Akun Administrator Utama tidak dapat dihapus' }, { status: 403 });
     }
 
     // Prevent deleting self

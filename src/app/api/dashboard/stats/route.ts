@@ -128,42 +128,60 @@ export async function GET(request: NextRequest) {
     };
 
     // Chart data - use custom date range if provided, otherwise last 7 days
-    const chartData: any[] = [];
     let chartStartDate: Date;
     let chartEndDate: Date;
     
     if (startDateParam && endDateParam) {
       chartStartDate = new Date(startDateParam);
       chartEndDate = new Date(endDateParam);
-      chartEndDate.setHours(23, 59, 59, 999);
     } else {
       chartStartDate = new Date();
       chartStartDate.setDate(chartStartDate.getDate() - 6);
-      chartStartDate.setHours(0, 0, 0, 0);
       chartEndDate = new Date();
-      chartEndDate.setHours(23, 59, 59, 999);
     }
+    
+    // Normalize dates
+    chartStartDate.setHours(0, 0, 0, 0);
+    chartEndDate.setHours(23, 59, 59, 999);
 
     const daysDiff = Math.ceil((chartEndDate.getTime() - chartStartDate.getTime()) / (1000 * 60 * 60 * 24));
     
+    // Fetch ALL transactions in range with ONE query
+    const allTransactionsInRange = await db.transaction.findMany({
+      where: { 
+        createdAt: { gte: chartStartDate, lte: chartEndDate },
+        ...(isKasir ? { userId } : {})
+      },
+      select: {
+        createdAt: true,
+        profit: true
+      }
+    });
+
+    const chartData: any[] = [];
+    
+    // Aggregate data in JS
     for (let i = 0; i <= daysDiff; i++) {
-      const date = new Date(chartStartDate);
-      date.setDate(chartStartDate.getDate() + i);
-      const dayStart = new Date(date.setHours(0, 0, 0, 0));
-      const dayEnd = new Date(date.setHours(23, 59, 59, 999));
+        const date = new Date(chartStartDate);
+        date.setDate(chartStartDate.getDate() + i);
+        const dayStart = new Date(date);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(date);
+        dayEnd.setHours(23, 59, 59, 999);
+        
+        const dayDateString = dayStart.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
 
-      const dayTransactions = await db.transaction.findMany({
-        where: { 
-          createdAt: { gte: dayStart, lte: dayEnd },
-          ...(isKasir ? { userId } : {})
-        },
-      });
+        // Filter transactions for this day from the pre-fetched array
+        const dayTransactions = allTransactionsInRange.filter(t => {
+            const tDate = new Date(t.createdAt);
+            return tDate >= dayStart && tDate <= dayEnd;
+        });
 
-      chartData.push({
-        date: dayStart.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }),
-        transactions: dayTransactions.length,
-        profit: dayTransactions.reduce((sum, tx) => sum + tx.profit, 0),
-      });
+        chartData.push({
+            date: dayDateString,
+            transactions: dayTransactions.length,
+            profit: dayTransactions.reduce((sum, tx) => sum + tx.profit, 0),
+        });
     }
 
     // Top products

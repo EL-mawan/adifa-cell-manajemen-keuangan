@@ -21,12 +21,14 @@ import {
   ChevronRight,
   Bell,
   Truck,
-  Users
+  Users,
+  Calendar
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/hooks/use-toast';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Link from 'next/link';
+import { Input } from '@/components/ui/input';
 
 interface DashboardStats {
   totalBalance: { value: number; growth: number };
@@ -51,10 +53,23 @@ export default function DashboardPage() {
   const { token, user } = useAuthStore();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Date filter state
+  const [startDate, setStartDate] = useState(() => {
+    const date = new Date();
+    date.setDate(date.getDate() - 6);
+    return date.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState(() => {
+    return new Date().toISOString().split('T')[0];
+  });
 
-  const fetchStats = async () => {
+  const fetchStats = async (customStart?: string, customEnd?: string) => {
     try {
-      const response = await fetch('/api/dashboard/stats', {
+      const start = customStart || startDate;
+      const end = customEnd || endDate;
+      
+      const response = await fetch(`/api/dashboard/stats?startDate=${start}&endDate=${end}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -79,9 +94,10 @@ export default function DashboardPage() {
     fetchStats();
     
     // Refresh on focus
-    window.addEventListener('focus', fetchStats);
-    return () => window.removeEventListener('focus', fetchStats);
-  }, [token]);
+    const handleFocus = () => fetchStats();
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [token, startDate, endDate]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -225,7 +241,7 @@ export default function DashboardPage() {
             <CardHeader className="flex flex-row items-center justify-between px-2 pt-2">
                 <div>
                   <CardTitle className="text-lg font-black tracking-tight">Performance</CardTitle>
-                  <p className="text-xs text-zinc-400 font-medium mt-0.5">Statistik transaksi 7 hari terakhir</p>
+                  <p className="text-xs text-zinc-400 font-medium mt-0.5">Statistik transaksi periode pilihan</p>
                 </div>
                 <div className="hidden sm:flex items-center gap-3">
                      <div className="flex items-center gap-1.5 text-xs font-bold bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full">
@@ -238,6 +254,29 @@ export default function DashboardPage() {
                      </div>
                 </div>
             </CardHeader>
+            <div className="px-4 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="flex-1 relative group">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
+                  <Input 
+                    type="date" 
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="pl-9 pr-3 rounded-full h-9 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-[10px] ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
+                  />
+                </div>
+                <span className="text-zinc-400 font-black text-[9px] uppercase tracking-tighter shrink-0">s.d</span>
+                <div className="flex-1 relative group">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
+                  <Input 
+                    type="date" 
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="pl-9 pr-3 rounded-full h-9 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-[10px] ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
+                  />
+                </div>
+              </div>
+            </div>
             <CardContent className="px-0 pb-2">
                 <div className="h-[280px] w-full mt-6">
                     <ResponsiveContainer width="100%" height="100%">

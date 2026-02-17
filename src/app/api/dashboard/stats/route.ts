@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const { searchParams } = new URL(request.url);
+    const startDateParam = searchParams.get('startDate');
+    const endDateParam = searchParams.get('endDate');
+
     // Check if user has access
     const hasAccess = requireRole(['ADMIN', 'KASIR'])(auth.user);
     if (!hasAccess) {
@@ -123,11 +127,28 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    // Chart data (last 7 days)
+    // Chart data - use custom date range if provided, otherwise last 7 days
     const chartData: any[] = [];
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
+    let chartStartDate: Date;
+    let chartEndDate: Date;
+    
+    if (startDateParam && endDateParam) {
+      chartStartDate = new Date(startDateParam);
+      chartEndDate = new Date(endDateParam);
+      chartEndDate.setHours(23, 59, 59, 999);
+    } else {
+      chartStartDate = new Date();
+      chartStartDate.setDate(chartStartDate.getDate() - 6);
+      chartStartDate.setHours(0, 0, 0, 0);
+      chartEndDate = new Date();
+      chartEndDate.setHours(23, 59, 59, 999);
+    }
+
+    const daysDiff = Math.ceil((chartEndDate.getTime() - chartStartDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    for (let i = 0; i <= daysDiff; i++) {
+      const date = new Date(chartStartDate);
+      date.setDate(chartStartDate.getDate() + i);
       const dayStart = new Date(date.setHours(0, 0, 0, 0));
       const dayEnd = new Date(date.setHours(23, 59, 59, 999));
 

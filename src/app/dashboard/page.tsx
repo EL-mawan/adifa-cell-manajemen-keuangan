@@ -102,7 +102,7 @@ export default function DashboardPage() {
   // Helper Component for Stats Card with styling flexible for horizontal scroll
   const StatCard = ({ title, value, icon: Icon, trend, trendValue, colorClass, href }: any) => {
     const InnerContent = (
-      <Card className="min-w-0 flex-1 rounded-3xl border-none shadow-sm bg-white dark:bg-zinc-900 overflow-hidden relative group hover:shadow-md transition-all duration-300 cursor-pointer h-full">
+      <Card className={`min-w-0 flex-1 rounded-3xl border-none shadow-sm bg-white dark:bg-zinc-900 overflow-hidden relative group hover:shadow-md transition-all duration-300 h-full ${href ? 'cursor-pointer' : ''}`}>
         <CardHeader className="flex flex-row items-center justify-between pb-1 space-y-0 px-4 pt-4">
           <CardTitle className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-tight truncate">{title}</CardTitle>
           <div className={`h-7 w-7 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${colorClass || 'bg-zinc-50 dark:bg-zinc-800'}`}>
@@ -112,7 +112,7 @@ export default function DashboardPage() {
         <CardContent className="px-4 pb-4">
           <div className="text-base font-black text-zinc-900 dark:text-zinc-50 mb-0.5 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{value}</div>
           <div className="flex items-center gap-1">
-              <span className="text-[8px] text-zinc-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">Lihat rincian &rarr;</span>
+              {href && <span className="text-[8px] text-zinc-400 font-medium opacity-0 group-hover:opacity-100 transition-opacity">Lihat rincian &rarr;</span>}
           </div>
         </CardContent>
       </Card>
@@ -180,7 +180,6 @@ export default function DashboardPage() {
             value={formatCurrency(stats?.todayProfit.value || 0)} 
             icon={DollarSign}
             colorClass="bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20"
-            href="/dashboard/reports"
             trend={stats?.todayProfit.growth && stats.todayProfit.growth > 0 ? 'up' : 'down'}
             trendValue={stats?.todayProfit.growth ? `${Math.abs(stats.todayProfit.growth).toFixed(1)}%` : '0%'}
         />
@@ -189,7 +188,6 @@ export default function DashboardPage() {
             value={stats?.todayTransactions.value || 0}
             icon={ShoppingCart}
             colorClass="bg-amber-50 text-amber-600 dark:bg-amber-900/20"
-            href="/dashboard/transactions"
             trend={stats?.todayTransactions.growth && stats.todayTransactions.growth > 0 ? 'up' : 'down'}
             trendValue={stats?.todayTransactions.growth ? `${Math.abs(stats.todayTransactions.growth).toFixed(1)}%` : '0%'}
         />
@@ -198,7 +196,6 @@ export default function DashboardPage() {
             value={formatCurrency(stats?.todayAvg.value || 0)}
             icon={TrendingUp}
             colorClass="bg-rose-50 text-rose-600 dark:bg-rose-900/20"
-            href="/dashboard/reports"
             trend={stats?.todayAvg.growth && stats.todayAvg.growth > 0 ? 'up' : 'down'}
             trendValue={stats?.todayAvg.growth ? `${Math.abs(stats.todayAvg.growth).toFixed(1)}%` : '0%'}
         />

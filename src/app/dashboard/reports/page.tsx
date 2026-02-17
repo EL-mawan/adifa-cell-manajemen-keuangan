@@ -292,11 +292,15 @@ export default function ReportsPage() {
                     </div>
                     <div>
                         <p className="text-indigo-100 text-[8px] lg:text-xs font-black uppercase tracking-[0.2em]">Periode Aktif</p>
-                        <p className="text-base lg:text-2xl font-black mt-0.5 lg:mt-1 tracking-tight">
-                            {new Date(reportData.period.start).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })}
-                            <span className="mx-2 opacity-50 text-[10px] lg:text-sm font-normal italic">s.d</span>
-                            {new Date(reportData.period.end).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                        </p>
+                        <div className="flex flex-wrap items-baseline gap-x-2 mt-0.5 lg:mt-1">
+                            <span className="text-sm lg:text-2xl font-black tracking-tight whitespace-nowrap">
+                                {new Date(reportData.period.start).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                            </span>
+                            <span className="text-[10px] lg:text-sm font-normal italic opacity-50">s.d</span>
+                            <span className="text-sm lg:text-2xl font-black tracking-tight whitespace-nowrap">
+                                {new Date(reportData.period.end).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </CardContent>
@@ -428,7 +432,7 @@ export default function ReportsPage() {
               </div>
           </CardHeader>
           <CardContent className="p-0">
-              <div className="overflow-x-auto">
+              <div className="hidden md:block overflow-x-auto">
                   <Table>
                       <TableHeader className="bg-zinc-50/50 dark:bg-zinc-950/50">
                           <TableRow className="border-zinc-100 dark:border-zinc-800">
@@ -483,6 +487,32 @@ export default function ReportsPage() {
                           )}
                       </TableBody>
                   </Table>
+              </div>
+
+              {/* Mobile Deposit List */}
+              <div className="md:hidden px-4 pb-6 space-y-3">
+                  {reportData?.deposits && reportData.deposits.length > 0 ? (
+                      reportData.deposits.map((d, i) => (
+                          <div key={i} className="bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-3xl border border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-white dark:bg-zinc-800 flex items-center justify-center text-indigo-600 font-black shadow-sm">
+                                      {d.user.name.charAt(0)}
+                                  </div>
+                                  <div className="flex flex-col">
+                                      <span className="text-xs font-black text-zinc-900 dark:text-zinc-50">{d.user.name}</span>
+                                      <span className="text-[9px] text-indigo-500 font-bold">{new Date(d.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })} • {new Date(d.createdAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
+                                      <p className="text-[9px] text-zinc-400 font-medium mt-0.5 truncate max-w-[120px]">{d.description || 'Top Up Saldo'}</p>
+                                  </div>
+                              </div>
+                              <div className="text-right">
+                                  <p className="text-sm font-black text-emerald-500">+ {formatCurrency(d.amount).replace('Rp', '')}</p>
+                                  <span className="text-[8px] font-bold text-zinc-300">IDR</span>
+                              </div>
+                          </div>
+                      ))
+                  ) : (
+                    <div className="py-10 text-center text-zinc-400 italic text-xs">Belum ada mutasi masuk.</div>
+                  )}
               </div>
           </CardContent>
       </Card>

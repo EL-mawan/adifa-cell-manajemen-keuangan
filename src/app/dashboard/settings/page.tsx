@@ -55,22 +55,22 @@ export default function SettingsPage() {
       <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         {/* Navigation Tabs - Refined for both mobile and desktop */}
         <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-2">
-          <div className="flex lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide -mx-4 px-4 lg:mx-0 lg:px-0">
+          <div className="flex lg:flex-col gap-2 overflow-x-auto pb-4 lg:pb-0 scrollbar-hide -mx-4 px-4 lg:mx-0 lg:px-0 snap-x">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center lg:items-center gap-3 lg:gap-4 px-4 py-3 lg:py-4 rounded-2xl lg:rounded-3xl transition-all duration-300 min-w-max lg:min-w-0 text-left group shrink-0
+                className={`flex items-center gap-3 lg:gap-4 px-4 py-3 lg:py-4 rounded-2xl lg:rounded-3xl transition-all duration-300 min-w-max lg:min-w-0 text-left group shrink-0 snap-start
                   ${activeTab === tab.id 
                     ? 'bg-indigo-600 text-white shadow-lg lg:shadow-xl shadow-indigo-200 dark:shadow-none lg:translate-x-1' 
                     : 'bg-white dark:bg-zinc-900 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 border border-zinc-100 dark:border-zinc-800'
                   }`}
               >
-                <div className={`p-2 rounded-xl lg:rounded-2xl transition-colors ${activeTab === tab.id ? 'bg-white/20' : 'bg-zinc-100 dark:bg-zinc-800'}`}>
-                  <tab.icon className="h-4 w-4 lg:h-5 lg:w-5" />
+                <div className={`p-1.5 lg:p-2 rounded-xl lg:rounded-2xl transition-colors ${activeTab === tab.id ? 'bg-white/20' : 'bg-zinc-100 dark:bg-zinc-800'}`}>
+                  <tab.icon className="h-3.5 w-3.5 lg:h-5 lg:w-5" />
                 </div>
-                <div className="flex-1 pr-2 lg:pr-0">
-                  <p className={`font-black text-xs lg:text-sm tracking-tight ${activeTab === tab.id ? 'text-white' : 'text-zinc-900 dark:text-zinc-100'}`}>
+                <div className="flex-1 pr-1 lg:pr-0">
+                  <p className={`font-black text-[11px] lg:text-sm tracking-tight ${activeTab === tab.id ? 'text-white' : 'text-zinc-900 dark:text-zinc-100'}`}>
                     {tab.name}
                   </p>
                   <p className={`text-[9px] lg:text-[10px] hidden lg:block font-medium ${activeTab === tab.id ? 'text-indigo-100' : 'text-zinc-400'}`}>

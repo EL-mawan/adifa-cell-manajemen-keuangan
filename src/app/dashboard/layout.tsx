@@ -19,7 +19,8 @@ import {
   Bell,
   Search,
   Menu,
-  ShoppingCart
+  ShoppingCart,
+  Truck
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { toast } from '@/hooks/use-toast';
@@ -46,6 +47,7 @@ const navigation = [
   { name: 'Transaksi', href: '/dashboard/transactions', icon: ShoppingCart, roles: ['ADMIN', 'KASIR'] },
   { name: 'Produk', href: '/dashboard/products', icon: ShoppingBag, roles: ['ADMIN'] }, 
   { name: 'Saldo', href: '/dashboard/balance', icon: Wallet, roles: ['ADMIN', 'KASIR'] },
+  { name: 'Supplier', href: '/dashboard/master-data/suppliers', icon: Truck, roles: ['ADMIN'] },
   { name: 'Admin', href: '/dashboard/users', icon: Users, roles: ['ADMIN'] },
   { name: 'Laporan', href: '/dashboard/reports', icon: FileText, roles: ['ADMIN'] },
   { name: 'Audit Log', href: '/dashboard/audit', icon: History, roles: ['ADMIN'] },
@@ -62,12 +64,33 @@ export default function DashboardLayout({
   const { user, isAuthenticated, logout } = useAuthStore();
   const [mounted, setMounted] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [liveBalance, setLiveBalance] = useState<number>(user?.balance || 0);
+
+  const fetchBalance = async () => {
+    try {
+      const response = await fetch('/api/dashboard/stats', {
+        headers: { Authorization: `Bearer ${useAuthStore.getState().token}` },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setLiveBalance(data.totalBalance.value);
+      }
+    } catch (error) {
+      console.error('Failed to fetch balance:', error);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
     if (!isAuthenticated) {
       router.push('/');
+      return;
     }
+    
+    fetchBalance();
+    // Refresh balance every 30 seconds
+    const interval = setInterval(fetchBalance, 30000);
+    return () => clearInterval(interval);
   }, [isAuthenticated, router]);
 
   const confirmLogout = async () => {
@@ -176,7 +199,7 @@ export default function DashboardLayout({
                 <div className="flex flex-col items-end mr-1">
                     <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-tight">Saldo</span>
                     <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
-                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(user.balance)}
+                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(liveBalance)}
                     </span>
                 </div>
                 <Button 
@@ -212,9 +235,9 @@ export default function DashboardLayout({
                 <div className="flex items-center gap-4">
                     {/* Integrated Balance Display */}
                     <div className="hidden lg:flex flex-col items-end mr-2 px-4 py-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
-                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest leading-none mb-1">Saldo Anda</span>
+                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest leading-none mb-1">Total Saldo</span>
                         <span className="text-sm font-black text-indigo-600 dark:text-indigo-400 leading-none">
-                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(user.balance)}
+                            {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(liveBalance)}
                         </span>
                     </div>
 

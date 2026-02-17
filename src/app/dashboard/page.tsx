@@ -275,12 +275,12 @@ export default function DashboardPage() {
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-zinc-400 shrink-0" />
                 <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger className="rounded-full h-9 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-xs ring-offset-white focus:ring-2 focus:ring-indigo-500 transition-all">
+                  <SelectTrigger className="cursor-pointer rounded-full h-9 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-xs ring-offset-white focus:ring-2 focus:ring-indigo-500 transition-all">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     {months.map((month) => (
-                      <SelectItem key={month.value} value={month.value} className="font-bold">
+                      <SelectItem key={month.value} value={month.value} className="cursor-pointer font-bold">
                         {month.label} {currentYear}
                       </SelectItem>
                     ))}

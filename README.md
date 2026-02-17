@@ -1,326 +1,169 @@
-# 🏪 Adifa Cell - Sistem Manajemen Keuangan PPOB
+# Adifa Cell - Manajemen Keuangan PPOB
 
-Sistem manajemen keuangan lengkap untuk agen pembayaran PPOB (Payment Point Online Bank) dengan fitur transaksi, manajemen saldo, laporan keuangan, dan audit trail.
+Sistem manajemen keuangan untuk agen pembayaran PPOB (Payment Point Online Bank) yang modern, cepat, dan mudah digunakan.
 
 ## ✨ Fitur Utama
 
-### 🔐 Authentication & Authorization
-- Login & Logout dengan JWT
-- Role-based access control (Admin & Kasir)
-- Session management yang aman
+- 📊 **Dashboard Real-time** - Monitoring transaksi dan profit secara langsung
+- 💰 **Manajemen Saldo** - Top-up dan tracking mutasi saldo otomatis
+- 📱 **Transaksi PPOB** - Pulsa, paket data, token listrik, dll
+- 📈 **Laporan Keuangan** - Export PDF & Excel dengan filter tanggal
+- 👥 **Multi-User** - Role Admin & Kasir dengan permission berbeda
+- 🔒 **Keamanan** - JWT Authentication & Activity Logging
+- 📲 **PWA Support** - Install sebagai aplikasi di HP/Desktop
+- 🌙 **Dark Mode** - Tema gelap untuk kenyamanan mata
 
-### 📊 Dashboard
-- Total Saldo Agen
-- Total Transaksi Hari Ini
-- Total Keuntungan Hari Ini
-- Grafik Transaksi 7 Hari Terakhir
-- Top Produk Terlaris
-- Notifikasi Saldo Minimum
+## 🚀 Tech Stack
 
-### 💼 Master Data
-- **Data Produk PPOB**: Pulsa, Paket Data, PLN, PDAM, BPJS, dll
-- **Data Supplier**: Manajemen penyedia layanan
-- **Fee per Produk**: Konfigurasi fee dan keuntungan
-- **Data User**: Manajemen admin dan kasir
+- **Framework**: Next.js 15 (App Router)
+- **Database**: Turso (LibSQL/SQLite Cloud)
+- **ORM**: Prisma
+- **Runtime**: Bun
+- **UI**: Tailwind CSS + shadcn/ui
+- **Charts**: Recharts
+- **Auth**: JWT
 
-### 💳 Transaksi
-- Input transaksi baru
-- Pilih produk dan input nomor pelanggan
-- Perhitungan otomatis: harga modal, fee, dan keuntungan
-- Status tracking: Sukses / Pending / Gagal
-- Cetak Struk (PDF)
-
-### 💰 Manajemen Saldo
-- Top Up Saldo
-- Riwayat Mutasi Saldo
-- Alert otomatis jika saldo < minimum
-
-### 📈 Laporan Keuangan
-- Laporan Harian
-- Laporan Bulanan
-- Export PDF & Excel
-- Rekapitulasi: Total Modal, Penjualan, Fee, Profit
-
-### 🔍 Audit & Tracking
-- Log aktivitas user lengkap
-- Filter berdasarkan tanggal, modul, dan aksi
-- Tracking transaksi bermasalah
-
-### 🎨 UI/UX
-- Modern fintech dashboard
-- Sidebar navigation yang responsif
-- Dark mode support
-- Animasi dan transisi smooth
-- Tabel dengan search & filter
-
-## 🛠️ Technology Stack
-
-### Core Framework
-- **⚡ Next.js 16** - React framework dengan App Router
-- **📘 TypeScript 5** - Type-safe development
-- **🎨 Tailwind CSS 4** - Utility-first CSS framework
-- **🧩 shadcn/ui** - High-quality UI components
-
-### Database & Auth
-- **🗄️ Prisma** - Next-generation TypeScript ORM
-- **🔐 JWT** - Secure authentication
-- **🔒 bcryptjs** - Password hashing
-
-### State & Data
-- **🐻 Zustand** - State management
-- **🔄 TanStack Query** - Data synchronization
-- **📊 Recharts** - Chart library
-
-### Export & Utils
-- **📄 jsPDF** - PDF generation
-- **📊 jspdf-autotable** - PDF tables
-- **📈 xlsx** - Excel export
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ atau Bun
-- SQLite (included)
-
-### Installation
+## 📦 Instalasi Lokal
 
 ```bash
+# Clone repository
+git clone https://github.com/EL-mawan/adifa-cell-manajemen-keuangan.git
+cd adifa-cell-manajemen-keuangan
+
 # Install dependencies
 bun install
 
 # Setup database
-bun run db:push
+cp .env.example .env
+# Edit .env dengan konfigurasi Anda
 
-# Seed initial data (optional, but recommended)
-bun run prisma/seed.ts
+# Generate Prisma Client
+bunx prisma generate
 
-# Start development server
+# Push schema ke database
+bunx prisma db push
+
+# Seed data awal (opsional)
+bunx prisma db seed
+
+# Run development server
 bun run dev
 ```
 
-### Default Login Credentials
+Buka [http://localhost:3000](http://localhost:3000) di browser.
 
-Setelah menjalankan seed script, Anda dapat login dengan:
+### Login Default
+- **Email**: `admin@adifacell.com`
+- **Password**: `admin123`
 
-**Admin:**
-- Email: `admin@adifacell.com`
-- Password: `admin123`
+## 🌐 Deployment
 
-**Kasir:**
-- Email: `kasir@adifacell.com`
-- Password: `kasir123`
+Lihat panduan lengkap di [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)
 
-## 📁 Project Structure
+**Rekomendasi**: Vercel + Turso (Gratis & Mudah)
 
-```
-src/
-├── app/
-│   ├── api/                    # API Routes
-│   │   ├── auth/              # Authentication endpoints
-│   │   ├── balance/           # Balance management
-│   │   ├── dashboard/         # Dashboard stats
-│   │   ├── products/          # Product management
-│   │   ├── transactions/      # Transaction handling
-│   │   ├── reports/           # Financial reports
-│   │   ├── audit/             # Audit logs
-│   │   └── users/             # User management
-│   ├── dashboard/             # Dashboard pages
-│   │   ├── page.tsx          # Main dashboard
-│   │   ├── transactions/     # Transaction module
-│   │   ├── balance/          # Balance management
-│   │   ├── reports/          # Financial reports
-│   │   ├── audit/            # Audit logs
-│   │   ├── products/         # Product management
-│   │   ├── master-data/      # Master data overview
-│   │   └── settings/         # Settings
-│   ├── layout.tsx            # Root layout with theme provider
-│   └── page.tsx              # Login page
-├── components/
-│   ├── ui/                   # shadcn/ui components
-│   └── theme-provider.tsx    # Theme context
-├── lib/
-│   ├── auth-api.ts          # API auth utilities
-│   ├── db.ts                # Prisma client
-│   ├── jwt.ts               # JWT utilities
-│   ├── store/
-│   │   └── auth.ts          # Auth state management
-│   └── utils.ts             # Utility functions
-└── hooks/
-    ├── use-mobile.ts        # Mobile detection
-    └── use-toast.ts         # Toast notifications
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/EL-mawan/adifa-cell-manajemen-keuangan)
 
-prisma/
-├── schema.prisma            # Database schema
-└── seed.ts                 # Initial data seeding
-```
+## 📱 PWA Installation
 
-## 🗄️ Database Schema
+Aplikasi ini dapat diinstall sebagai aplikasi native di:
+- **Android**: Chrome → Menu (⋮) → "Install app"
+- **iOS**: Safari → Share → "Add to Home Screen"
+- **Desktop**: Chrome → Address bar → Install icon
 
-### Tables
-- **users** - User accounts (admin & kasir)
-- **products** - PPOB products
-- **suppliers** - Product suppliers
-- **transactions** - Transaction records
-- **balance_logs** - Balance mutations
-- **activity_logs** - User activity tracking
-- **system_settings** - System configuration
-
-### Key Relations
-- Transaction → Product & User
-- Balance Log → User
-- Activity Log → User
-- Product → Supplier
-
-## 🔒 Security Features
-
-- Password hashing dengan bcryptjs
-- JWT-based authentication
-- Role-based access control
-- Protected API routes
-- Activity logging untuk audit
-
-## 🐳 Docker Deployment
-
-### Build & Run with Docker
-
-```bash
-# Build Docker image
-docker build -t adifa-cell .
-
-# Run container
-docker run -p 3000:3000 \
-  -e DATABASE_URL="file:./db/custom.db" \
-  -e JWT_SECRET="your-secret-key" \
-  adifa-cell
-```
-
-### Environment Variables
-
-Lihat file `.env.example` untuk semua environment variables yang diperlukan:
-
-```bash
-cp .env.example .env
-# Edit .env dengan konfigurasi Anda
-```
-
-## 📊 Available API Endpoints
-
-### Authentication
-- `POST /api/auth/login` - User login
-- `POST /api/auth/logout` - User logout
-- `GET /api/auth/me` - Get current user
+## 📸 Screenshots
 
 ### Dashboard
-- `GET /api/dashboard/stats` - Dashboard statistics
+![Dashboard](docs/screenshots/dashboard.png)
 
-### Transactions
-- `GET /api/transactions` - List transactions
-- `POST /api/transactions` - Create transaction
-- `GET /api/transactions/[id]` - Get transaction details
+### Transaksi
+![Transactions](docs/screenshots/transactions.png)
 
-### Products
-- `GET /api/products` - List products
-- `POST /api/products` - Create product (Admin only)
+### Laporan Keuangan
+![Reports](docs/screenshots/reports.png)
 
-### Balance
-- `GET /api/balance` - Get balance logs
-- `POST /api/balance` - Top up balance
-
-### Reports
-- `GET /api/reports` - Financial reports (Admin only)
-
-### Audit
-- `GET /api/audit` - Activity logs (Admin only)
-
-### Users
-- `GET /api/users` - List users (Admin only)
-- `POST /api/users` - Create user (Admin only)
-
-## 🎨 UI Design
-
-### Color Scheme
-- **Primary**: Blue (biru tua) - Trust & professionalism
-- **Secondary**: Emerald (hijau) - Success & growth
-- **Accent**: Purple, Orange - Visual hierarchy
-- **Background**: Clean white with dark mode support
-
-### Design Principles
-- Modern fintech aesthetic
-- High contrast for readability
-- Consistent spacing and typography
-- Smooth animations and transitions
-- Mobile-first responsive design
-
-## 🤝 Role Permissions
-
-### Admin
-- Full access to all features
-- Manage products and suppliers
-- Manage users and their permissions
-- Access financial reports
-- View audit logs
-- System settings
-
-### Kasir
-- Create transactions
-- View transaction history
-- Manage own balance
-- View basic dashboard
-- No access to reports or settings
-
-## 📝 Development
-
-### Available Scripts
+## 🔧 Development
 
 ```bash
-bun run dev          # Start development server
-bun run build        # Build for production
-bun run start        # Start production server
-bun run lint         # Run ESLint
-bun run db:push      # Push database schema
-bun run db:generate  # Generate Prisma Client
-bun run db:reset     # Reset database
-```
+# Run dev server
+bun run dev
 
-### Code Quality
+# Build for production
+bun run build
 
-```bash
+# Start production server
+bun run start
+
 # Lint code
 bun run lint
 
-# Type check
-bunx tsc --noEmit
+# Database commands
+bunx prisma studio        # Open Prisma Studio
+bunx prisma db push       # Push schema changes
+bunx prisma generate      # Generate Prisma Client
 ```
 
-## 🚀 Production Deployment
+## 📁 Struktur Project
 
-### Environment Setup
-
-1. Set production environment variables
-2. Generate a secure JWT_SECRET
-3. Configure DATABASE_URL for production database
-4. Set up SSL/HTTPS
-
-### Build
-
-```bash
-bun run build
+```
+adifa-cell/
+├── src/
+│   ├── app/              # Next.js App Router
+│   │   ├── api/          # API Routes
+│   │   ├── dashboard/    # Dashboard Pages
+│   │   └── page.tsx      # Landing Page
+│   ├── components/       # React Components
+│   ├── lib/              # Utilities & Config
+│   └── hooks/            # Custom React Hooks
+├── prisma/
+│   └── schema.prisma     # Database Schema
+├── public/               # Static Assets
+└── .env.example          # Environment Variables Template
 ```
 
-### Run
+## 🔐 Environment Variables
 
-```bash
-bun start
+```env
+# Database (Turso)
+DATABASE_URL="libsql://[your-db].turso.io"
+TURSO_AUTH_TOKEN="your-token"
+
+# JWT
+JWT_SECRET="your-secret-key"
+
+# App
+NEXT_PUBLIC_APP_NAME="Adifa Cell"
+NEXT_PUBLIC_APP_URL="https://your-domain.com"
+NODE_ENV="production"
 ```
 
-## 📄 License
+## 🤝 Contributing
 
-This project is proprietary and confidential.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 👥 Support
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-For support and questions, please contact the Adifa Cell team.
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 👨‍💻 Author
+
+**EL-mawan**
+- GitHub: [@EL-mawan](https://github.com/EL-mawan)
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/)
+- [Turso](https://turso.tech/)
+- [Prisma](https://www.prisma.io/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Bun](https://bun.sh/)
 
 ---
 
-Built with ❤️ using Next.js, TypeScript, and modern web technologies.
+⭐ Jika project ini membantu Anda, berikan star di GitHub!

@@ -28,9 +28,10 @@ if (typeof PrismaLibSQL === 'function' && tursoUrl) {
 
 export const db =
   globalForPrisma.prisma ??
-  new PrismaClient({
-    adapter,
-    log: ['query'],
-  })
+  new PrismaClient(
+    adapter 
+      ? { adapter, log: ['query'] } 
+      : { log: ['query'] }
+  )
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db

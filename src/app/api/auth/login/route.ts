@@ -74,10 +74,10 @@ export async function POST(request: NextRequest) {
       },
       token,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Terjadi kesalahan saat login' },
+      { error: `Terjadi kesalahan saat login: ${error.message || 'Unknown error'}` },
       { status: 500 }
     );
   }

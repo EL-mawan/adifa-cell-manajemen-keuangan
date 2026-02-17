@@ -53,17 +53,22 @@ export async function POST(request: NextRequest) {
       role: user.role,
     });
 
-    // Log activity
-    await db.activityLog.create({
-      data: {
-        userId: user.id,
-        action: 'LOGIN',
-        module: 'AUTH',
-        details: 'User berhasil login',
-        ipAddress: request.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1',
-        userAgent: request.headers.get('user-agent') || 'unknown',
-      },
-    });
+    // Log activity (wrapped in try-catch to prevent login failure if DB is read-only)
+    try {
+      await db.activityLog.create({
+        data: {
+          userId: user.id,
+          action: 'LOGIN',
+          module: 'AUTH',
+          details: 'User berhasil login',
+          ipAddress: request.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1',
+          userAgent: request.headers.get('user-agent') || 'unknown',
+        },
+      });
+    } catch (logError) {
+      console.error('Failed to log login activity:', logError);
+      // We continue since the user has already authenticated successfully
+    }
 
     return NextResponse.json({
       user: {

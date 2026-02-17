@@ -254,58 +254,106 @@ export default function DashboardPage() {
 
       {/* Charts Section */}
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-2 rounded-[2.5rem] border-none shadow-sm bg-white dark:bg-zinc-900 p-4 overflow-hidden outline outline-zinc-100 dark:outline-zinc-800">
-            <CardHeader className="flex flex-row items-center justify-between px-2 pt-2">
+        <Card className="md:col-span-2 rounded-[2.5rem] border-none shadow-xl shadow-indigo-100/50 dark:shadow-none bg-white dark:bg-zinc-900 overflow-hidden relative group">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+            
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-2 px-6 pt-6 relative z-10 gap-4">
                 <div>
-                  <CardTitle className="text-lg font-black tracking-tight">Performance</CardTitle>
-                  <p className="text-xs text-zinc-400 font-medium mt-0.5">Statistik transaksi periode pilihan</p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl text-indigo-600 dark:text-indigo-400">
+                      <TrendingUp className="h-5 w-5" />
+                    </div>
+                    <CardTitle className="text-xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">Performance</CardTitle>
+                  </div>
+                  <p className="text-xs text-zinc-500 font-medium pl-1">Analisa profit & transaksi bulanan</p>
                 </div>
-                <div className="hidden sm:flex items-center gap-3">
-                     <div className="flex items-center gap-1.5 text-xs font-bold bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full">
-                        <span className="w-2 h-2 rounded-full bg-indigo-600"></span>
-                        <span>Profit</span>
-                     </div>
-                     <div className="flex items-center gap-1.5 text-xs font-bold bg-zinc-50 text-zinc-400 px-3 py-1.5 rounded-full">
-                        <span className="w-2 h-2 rounded-full bg-zinc-200"></span>
-                        <span>Settle</span>
-                     </div>
+
+                <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    {/* Month Filter */}
+                    <div className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800/50 p-1 rounded-full border border-zinc-100 dark:border-zinc-800">
+                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                          <SelectTrigger className="cursor-pointer border-none shadow-none bg-transparent h-8 w-[140px] focus:ring-0 text-xs font-black text-zinc-700 dark:text-zinc-300">
+                            <div className="flex items-center gap-2">
+                                <Calendar className="h-3.5 w-3.5 text-indigo-500" />
+                                <SelectValue />
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent align="end" className="rounded-2xl border-zinc-100 dark:border-zinc-800 shadow-xl">
+                            {months.map((month) => (
+                              <SelectItem key={month.value} value={month.value} className="cursor-pointer font-bold text-xs py-2">
+                                {month.label} {currentYear}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </CardHeader>
-            <div className="px-4 pb-3">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-zinc-400 shrink-0" />
-                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger className="cursor-pointer rounded-full h-9 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-xs ring-offset-white focus:ring-2 focus:ring-indigo-500 transition-all">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((month) => (
-                      <SelectItem key={month.value} value={month.value} className="cursor-pointer font-bold">
-                        {month.label} {currentYear}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <CardContent className="px-0 pb-2">
-                <div className="h-[280px] w-full mt-6">
+            
+            <CardContent className="px-2 sm:px-6 pb-6 pt-2 relative z-10">
+                {/* Legend */}
+                <div className="flex items-center gap-4 mb-6 pl-2">
+                     <div className="flex items-center gap-2 text-xs font-bold text-zinc-500">
+                        <span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-200"></span>
+                        <span>Total Profit</span>
+                     </div>
+                     <div className="flex items-center gap-2 text-xs font-bold text-zinc-400">
+                        <span className="w-2.5 h-2.5 rounded-full bg-zinc-200 dark:bg-zinc-700"></span>
+                        <span>Total Transaksi</span>
+                     </div>
+                </div>
+
+                <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={stats?.chartData || []}>
-                            <CartesianGrid strokeDasharray="6 6" vertical={false} stroke="#f4f4f5" />
+                        <BarChart data={stats?.chartData || []} barGap={4}>
+                            <defs>
+                                <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#6366f1" stopOpacity={1}/>
+                                    <stop offset="95%" stopColor="#818cf8" stopOpacity={0.8}/>
+                                </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" opacity={0.6} />
                             <XAxis 
                               dataKey="date" 
                               axisLine={false} 
                               tickLine={false} 
-                              className="text-[10px] text-zinc-400 font-bold" 
-                              dy={15} 
+                              className="text-[10px] text-zinc-400 font-bold tracking-wide" 
+                              dy={15}
+                              minTickGap={30}
                             />
                             <Tooltip 
-                                cursor={{fill: '#f8fafc', radius: 12}}
-                                contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 50px -10px rgba(0,0,0,0.1)', padding: '16px' }}
+                                cursor={{fill: '#f4f4f5', opacity: 0.4, radius: 8}}
+                                contentStyle={{ 
+                                    borderRadius: '16px', 
+                                    border: 'none', 
+                                    boxShadow: '0 10px 40px -10px rgba(0,0,0,0.1)', 
+                                    padding: '12px 16px',
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                    backdropFilter: 'blur(8px)'
+                                }}
+                                formatter={(value: number, name: string) => [
+                                    name === 'profit' ? `Rp ${value.toLocaleString('id-ID')}` : value,
+                                    name === 'profit' ? 'Profit' : 'Transaksi'
+                                ]}
+                                labelStyle={{ color: '#71717a', fontSize: '11px', fontWeight: 'bold', marginBottom: '4px' }}
+                                itemStyle={{ fontSize: '12px', fontWeight: 'bold', padding: 0 }}
                             />
-                            <Bar dataKey="profit" fill="#4f46e5" radius={[8, 8, 8, 8]} barSize={28} />
-                            <Bar dataKey="transactions" fill="#e0e7ff" radius={[8, 8, 8, 8]} barSize={12} />
+                            <Bar 
+                                dataKey="profit" 
+                                fill="url(#colorProfit)" 
+                                radius={[6, 6, 6, 6]} 
+                                barSize={24}
+                                animationDuration={1000}
+                            />
+                            <Bar 
+                                dataKey="transactions" 
+                                fill="#e4e4e7" 
+                                radius={[6, 6, 6, 6]} 
+                                barSize={12} 
+                                animationDuration={1000}
+                                animationBegin={200}
+                            />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

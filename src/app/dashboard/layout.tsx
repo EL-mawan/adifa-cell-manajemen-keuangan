@@ -121,7 +121,7 @@ export default function DashboardLayout({
     { name: 'Transaksi', href: '/dashboard/transactions', icon: ShoppingCart },
     { name: 'Produk', href: '/dashboard/products', icon: ShoppingBag },
     { name: 'Saldo', href: '/dashboard/balance', icon: Wallet },
-    { name: 'Admin', href: '/dashboard/users', icon: UserCog },
+    { name: 'Logout', action: 'logout', icon: LogOut },
   ];
 
   const SidebarContent = () => (
@@ -191,26 +191,10 @@ export default function DashboardLayout({
       </AnimatePresence>
 
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-800/50 px-6 py-3 flex items-center justify-between shadow-sm">
-            <Link href="/dashboard" className="flex items-center gap-2">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-800/50 px-6 py-3 flex items-center justify-between shadow-sm text-center">
+            <Link href="/dashboard" className="flex items-center gap-2 mx-auto">
                 <Logo className="h-8 w-8" showText={true} />
             </Link>
-             <div className="flex items-center gap-3">
-                <div className="flex flex-col items-end mr-1">
-                    <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-tight">Saldo</span>
-                    <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
-                        {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(liveBalance)}
-                    </span>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-9 w-9 rounded-full text-red-500 hover:bg-red-50"
-                  onClick={() => setShowLogoutDialog(true)}
-                >
-                    <LogOut className="h-5 w-5" />
-                </Button>
-             </div>
       </div>
 
       <div className="flex pt-[68px] lg:pt-0">
@@ -272,8 +256,24 @@ export default function DashboardLayout({
       </div>
 
       <div className="lg:hidden fixed bottom-6 left-6 right-6 bg-indigo-600 dark:bg-indigo-700 backdrop-blur-xl border border-white/20 flex justify-around items-center px-2 py-3 z-50 rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(79,70,229,0.4)]">
-        {bottomNavItems.map((item) => {
+        {bottomNavItems.map((item: any) => {
            const isActive = pathname === item.href;
+           
+           if (item.action === 'logout') {
+             return (
+               <button
+                  key={item.name}
+                  onClick={() => setShowLogoutDialog(true)}
+                  className="flex flex-col items-center justify-center relative px-3 py-1.5 transition-all duration-300 min-w-[64px] text-white"
+               >
+                  <item.icon className="h-5 w-5 stroke-2 opacity-90 text-red-300" />
+                  <span className="text-[8px] font-black mt-1 tracking-tighter uppercase opacity-80">
+                      {item.name}
+                  </span>
+               </button>
+             );
+           }
+
            return (
              <Link 
                 key={item.name} 

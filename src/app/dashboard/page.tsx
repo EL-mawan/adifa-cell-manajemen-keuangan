@@ -19,7 +19,9 @@ import {
   History,
   Settings,
   ChevronRight,
-  Bell
+  Bell,
+  Truck,
+  Users
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/hooks/use-toast';
@@ -92,8 +94,9 @@ export default function DashboardPage() {
   // Quick Links (Mobile Only)
   const quickLinks = [
     { title: "Laporan", icon: FileText, href: "/dashboard/reports", color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400" },
-    { title: "Audit Log", icon: History, href: "/dashboard/audit", color: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400" },
+    { title: "Supplier", icon: Truck, href: "/dashboard/master-data/suppliers", color: "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400" },
     { title: "Pengaturan", icon: Settings, href: "/dashboard/settings", color: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400" },
+    { title: "Admin", icon: Users, href: "/dashboard/users", color: "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400" },
   ];
 
   // Helper Component for Stats Card with styling flexible for horizontal scroll
@@ -145,22 +148,6 @@ export default function DashboardPage() {
             Dashboard
           </h1>
           <p className="text-zinc-500 font-medium">Monitoring performa bisnismu hari ini.</p>
-        </div>
-        
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 hide-scrollbar snap-x">
-          <Button variant="outline" className="rounded-2xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-bold text-xs h-10 px-4 snap-start">
-            7 Hari Terakhir
-          </Button>
-          <Button variant="outline" className="rounded-2xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-bold text-xs h-10 px-4 snap-start">
-            Bulan Ini
-          </Button>
-          <Button 
-            onClick={fetchStats} 
-            className="rounded-2xl bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 font-bold text-xs h-10 px-4 shadow-lg snap-start"
-          >
-            <RefreshCw className={`h-3 w-3 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
         </div>
       </div>
 
@@ -220,12 +207,6 @@ export default function DashboardPage() {
       {/* Quick Menu Card (Moved above Performance) */}
       <Card className="md:hidden rounded-[2.5rem] border-none shadow-sm bg-white dark:bg-zinc-900 p-4 outline outline-zinc-100 dark:outline-zinc-800">
         <div className="grid grid-cols-4 gap-4">
-          <Link href="/dashboard/transactions" className="flex flex-col items-center gap-2 active:scale-95 transition-transform group">
-            <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl flex items-center justify-center bg-indigo-600 text-white shadow-lg shadow-indigo-100 dark:shadow-none transition-all group-hover:scale-105">
-              <ShoppingCart className="h-6 w-6 md:h-8 md:w-8" />
-            </div>
-            <span className="text-[10px] md:text-xs font-bold text-zinc-600 dark:text-zinc-400 text-center">Transaksi</span>
-          </Link>
           {quickLinks.map((link) => (
             <Link 
               href={link.href} 

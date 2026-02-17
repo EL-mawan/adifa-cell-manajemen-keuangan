@@ -251,22 +251,22 @@ export default function ReportsPage() {
          <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto px-1 lg:px-0">
           <div className="flex items-center gap-2 w-full">
             <div className="flex-1 relative group">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
+              <Calendar className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
               <Input 
                 type="date" 
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="pl-11 pr-4 rounded-full h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-xs ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
+                className="pl-9 sm:pl-11 pr-3 sm:pr-4 rounded-full h-9 sm:h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-[10px] sm:text-xs ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
               />
             </div>
-            <span className="text-zinc-400 font-black text-[10px] uppercase tracking-tighter shrink-0">s.d</span>
+            <span className="text-zinc-400 font-black text-[9px] sm:text-[10px] uppercase tracking-tighter shrink-0">s.d</span>
             <div className="flex-1 relative group">
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
+              <Calendar className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
               <Input 
                 type="date" 
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="pl-11 pr-4 rounded-full h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-xs ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
+                className="pl-9 sm:pl-11 pr-3 sm:pr-4 rounded-full h-9 sm:h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-[10px] sm:text-xs ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
               />
             </div>
           </div>
@@ -293,11 +293,11 @@ export default function ReportsPage() {
                     <div>
                         <p className="text-indigo-100 text-[8px] lg:text-xs font-black uppercase tracking-[0.2em]">Periode Aktif</p>
                         <div className="flex flex-wrap items-baseline gap-x-2 mt-0.5 lg:mt-1">
-                            <span className="text-sm lg:text-2xl font-black tracking-tight whitespace-nowrap">
+                            <span className="text-lg lg:text-2xl font-black tracking-tight whitespace-nowrap">
                                 {new Date(reportData.period.start).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                             </span>
-                            <span className="text-[10px] lg:text-sm font-normal italic opacity-50">s.d</span>
-                            <span className="text-sm lg:text-2xl font-black tracking-tight whitespace-nowrap">
+                            <span className="text-xs lg:text-sm font-normal italic opacity-50">s.d</span>
+                            <span className="text-lg lg:text-2xl font-black tracking-tight whitespace-nowrap">
                                 {new Date(reportData.period.end).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </span>
                         </div>

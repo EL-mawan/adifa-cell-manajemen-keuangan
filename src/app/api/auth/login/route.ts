@@ -1,3 +1,4 @@
+// Redeploy trigger: 2026-02-18 04:35
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';

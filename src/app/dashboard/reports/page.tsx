@@ -133,7 +133,7 @@ export default function ReportsPage() {
         ['Total Modal (HPP)', formatCurrency(reportData.summary.totalModal)],
         ['Total Penjualan (Gross)', formatCurrency(reportData.summary.totalPenjualan)],
         ['Total Fee Adm', formatCurrency(reportData.summary.totalFee)],
-        ['TOTAL KEUNTUNGAN (NET PROFIT)', formatCurrency(reportData.summary.totalProfit)],
+        ['TOTAL KEUNTUNGAN BERSIH', formatCurrency(reportData.summary.totalProfit)],
         ['TOTAL MASUK (TOP UP SALDO)', formatCurrency(reportData.summary.totalDeposit)],
       ],
       theme: 'grid',
@@ -250,23 +250,23 @@ export default function ReportsPage() {
         </div>
          <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto px-1 lg:px-0">
           <div className="flex items-center gap-2 w-full">
-            <div className="relative flex-1 sm:w-40">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+            <div className="flex-1 relative group">
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
               <Input 
                 type="date" 
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="pl-10 rounded-2xl h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-sm"
+                className="pl-11 pr-4 rounded-full h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-xs ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
               />
             </div>
-            <span className="text-zinc-400 font-bold text-xs uppercase">s.d</span>
-            <div className="relative flex-1 sm:w-40">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none" />
+            <span className="text-zinc-400 font-black text-[10px] uppercase tracking-tighter shrink-0">s.d</span>
+            <div className="flex-1 relative group">
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400 pointer-events-none group-focus-within:text-indigo-600 transition-colors" />
               <Input 
                 type="date" 
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="pl-10 rounded-2xl h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-sm"
+                className="pl-11 pr-4 rounded-full h-11 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm font-bold text-xs ring-offset-white focus-visible:ring-2 focus-visible:ring-indigo-500 transition-all appearance-none"
               />
             </div>
           </div>

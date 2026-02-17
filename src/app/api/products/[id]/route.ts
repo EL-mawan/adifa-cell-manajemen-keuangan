@@ -45,7 +45,8 @@ export async function PATCH(
 
     const newBasePrice = basePrice !== undefined ? parseFloat(basePrice) : existingProduct.basePrice;
     const newSellingPrice = sellingPrice !== undefined ? parseFloat(sellingPrice) : existingProduct.sellingPrice;
-    const newProfit = newSellingPrice - newBasePrice;
+    const newFee = fee !== undefined ? parseFloat(fee) : existingProduct.fee;
+    const newProfit = (newSellingPrice + newFee) - newBasePrice;
 
     const product = await db.product.update({
       where: { id },

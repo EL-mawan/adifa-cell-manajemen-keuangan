@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const profit = sellingPrice - basePrice;
+    const profit = (sellingPrice + (fee || 0)) - basePrice;
 
     const product = await db.product.create({
       data: {
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         action: 'CREATE_PRODUCT',
         module: 'PRODUCT',
         details: `Produk baru: ${name} (${code})`,
-        ipAddress: request.headers.get('x-forwarded-for') || request.ip || 'unknown',
+        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
         userAgent: request.headers.get('user-agent') || 'unknown',
       },
     });

@@ -19,7 +19,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/hooks/use-toast';
-import { Plus, RefreshCw, Search, Package, Edit, Trash2, Smartphone, Zap, FileText, Wallet } from 'lucide-react';
+import { Plus, RefreshCw, Search, Package, Edit, Trash2, Smartphone, Zap, FileText, Wallet, TrendingUp } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -387,21 +387,34 @@ export default function ProductsPage() {
 
               {/* Preview */}
               {formData.basePrice && formData.sellingPrice && (
-                <div className="bg-muted p-4 rounded-xl space-y-2 text-sm border">
-                  <p className="font-medium">Preview Profit:</p>
+                <div className="bg-muted p-4 rounded-xl space-y-2 text-sm border shadow-sm dark:bg-zinc-800/40">
+                  <p className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 mb-2">
+                    <TrendingUp className="h-4 w-4 text-emerald-500" />
+                    Preview Profit & Total
+                  </p>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Harga Modal:</span>
-                    <span>{formatCurrency(parseFloat(formData.basePrice) || 0)}</span>
+                    <span className="font-mono">{formatCurrency(parseFloat(formData.basePrice) || 0)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Harga Jual:</span>
-                    <span>{formatCurrency(parseFloat(formData.sellingPrice) || 0)}</span>
+                    <span className="text-muted-foreground">Harga Jual Dasar:</span>
+                    <span className="font-mono">{formatCurrency(parseFloat(formData.sellingPrice) || 0)}</span>
                   </div>
-                  <div className="flex justify-between font-semibold text-emerald-600 border-t pt-2 mt-2">
-                    <span>Profit:</span>
+                  <div className="flex justify-between border-b pb-2">
+                    <span className="text-muted-foreground">Fee Adm:</span>
+                    <span className="font-mono text-indigo-600 font-bold">+ {formatCurrency(parseFloat(formData.fee) || 0)}</span>
+                  </div>
+                  <div className="flex justify-between pt-1">
+                    <span className="font-bold">Total Pembayaran:</span>
+                    <span className="font-black text-blue-600">
+                        {formatCurrency((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0))}
+                    </span>
+                  </div>
+                  <div className="flex justify-between font-black text-emerald-600 border-t pt-2 mt-2 bg-emerald-50 dark:bg-emerald-950/20 px-2 rounded-lg py-1">
+                    <span>Net Profit:</span>
                     <span>
                       {formatCurrency(
-                        (parseFloat(formData.sellingPrice) || 0) - (parseFloat(formData.basePrice) || 0)
+                        ((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0)) - (parseFloat(formData.basePrice) || 0)
                       )}
                     </span>
                   </div>
@@ -473,8 +486,9 @@ export default function ProductsPage() {
                   <TableHead>Kategori</TableHead>
                   <TableHead>Supplier</TableHead>
                   <TableHead>Modal</TableHead>
-                  <TableHead>Jual</TableHead>
-                  <TableHead>Profit</TableHead>
+                  <TableHead>Jual Dasar</TableHead>
+                  <TableHead className="text-indigo-600">Fee Adm</TableHead>
+                  <TableHead>Net Profit</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
@@ -504,9 +518,10 @@ export default function ProductsPage() {
                         </div>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{product.supplier.name}</TableCell>
-                      <TableCell className="text-xs">{formatCurrency(product.basePrice)}</TableCell>
-                      <TableCell className="font-medium">{formatCurrency(product.sellingPrice)}</TableCell>
-                      <TableCell className="text-emerald-600 font-semibold text-xs">
+                      <TableCell className="text-xs text-muted-foreground">{formatCurrency(product.basePrice)}</TableCell>
+                      <TableCell className="text-xs">{formatCurrency(product.sellingPrice)}</TableCell>
+                      <TableCell className="text-xs font-black text-indigo-600">+{formatCurrency(product.fee)}</TableCell>
+                      <TableCell className="font-black text-emerald-600">
                         {formatCurrency(product.profit)}
                       </TableCell>
                       <TableCell>
@@ -570,12 +585,12 @@ export default function ProductsPage() {
 
                         <div className="grid grid-cols-2 gap-2 text-sm pt-2 border-t border-zinc-50 dark:border-zinc-800 mt-1">
                             <div>
-                                <p className="text-xs text-zinc-400">Harga Modal</p>
-                                <p className="font-medium text-zinc-600">{formatCurrency(product.basePrice)}</p>
+                                <p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">Total Jual</p>
+                                <p className="font-black text-indigo-600">{formatCurrency(product.sellingPrice + product.fee).replace('Rp', 'Rp ')}</p>
                             </div>
                             <div>
-                                <p className="text-xs text-zinc-400">Harga Jual</p>
-                                <p className="font-bold text-indigo-600">{formatCurrency(product.sellingPrice)}</p>
+                                <p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">Net Profit</p>
+                                <p className="font-black text-emerald-600">{formatCurrency(product.profit).replace('Rp', 'Rp ')}</p>
                             </div>
                         </div>
 

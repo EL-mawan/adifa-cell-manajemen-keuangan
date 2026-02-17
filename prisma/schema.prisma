@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  password     String
+  role         String        @default("KASIR")
+  balance      Float         @default(0)
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  activityLogs ActivityLog[]
+  balanceLogs  BalanceLog[]
+  transactions Transaction[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Supplier {
+  id        String    @id @default(cuid())
+  name      String
+  code      String    @unique
+  contact   String?
+  address   String?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+
+  @@index([code])
+}
+
+model Product {
+  id           String        @id @default(cuid())
+  code         String        @unique
+  name         String
+  category     String
+  supplierId   String
+  basePrice    Float
+  sellingPrice Float
+  fee          Float         @default(0)
+  profit       Float
+  isActive     Boolean       @default(true)
+  minBalance   Float         @default(0)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  supplier     Supplier      @relation(fields: [supplierId], references: [id])
+  transactions Transaction[]
+
+  @@index([code])
+  @@index([category])
+  @@index([supplierId])
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  transactionCode String   @unique
+  userId          String
+  productId       String
+  customerNumber  String
+  amount          Float
+  basePrice       Float
+  fee             Float    @default(0)
+  profit          Float    @default(0)
+  status          String
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  product         Product  @relation(fields: [productId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@index([transactionCode])
+  @@index([userId])
+  @@index([productId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model BalanceLog {
+  id            String   @id @default(cuid())
+  userId        String
+  type          String
+  amount        Float
+  balanceBefore Float
+  balanceAfter  Float
+  description   String?
+  referenceId   String?
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  module    String
+  details   String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([module])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([key])
+}

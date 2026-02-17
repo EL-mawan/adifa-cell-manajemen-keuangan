@@ -119,6 +119,23 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Cursor pointer for all interactive elements */
+  button,
+  a,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"],
+  select,
+  [role="menuitem"],
+  [role="option"],
+  [role="tab"],
+  label[for],
+  summary,
+  .cursor-pointer {
+    cursor: pointer;
+  }
 }
 
 @layer utilities {

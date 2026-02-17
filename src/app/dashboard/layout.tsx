@@ -191,10 +191,16 @@ export default function DashboardLayout({
       </AnimatePresence>
 
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-800/50 px-6 py-3 flex items-center justify-between shadow-sm text-center">
-            <Link href="/dashboard" className="flex items-center gap-2 mx-auto">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-zinc-100 dark:border-zinc-800/50 px-6 py-3 flex items-center justify-between shadow-sm">
+            <Link href="/dashboard" className="flex items-center gap-2">
                 <Logo className="h-8 w-8" showText={true} />
             </Link>
+            <div className="flex flex-col items-end">
+                <span className="text-[8px] font-bold text-zinc-400 uppercase tracking-tight">Total Saldo</span>
+                <span className="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(liveBalance)}
+                </span>
+            </div>
       </div>
 
       <div className="flex pt-[68px] lg:pt-0">

@@ -328,10 +328,10 @@ export default function TransactionsPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label>Nomor Pelanggan (HP / ID Pel)</Label>
+                                 <Label>Pelanggan</Label>
                                 <Input 
                                     className="rounded-xl h-11"
-                                    placeholder="0812xxxx / 1234xxxx"
+                                    placeholder="adifa"
                                     value={newTrx.customerNumber}
                                     onChange={(e) => setNewTrx({...newTrx, customerNumber: e.target.value})} 
                                 />

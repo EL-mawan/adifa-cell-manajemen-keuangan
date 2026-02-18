@@ -147,7 +147,14 @@ export default function ReportsPage() {
     });
 
     // --- 3. DETAIL TOP UP ---
-    const depositStartY = (doc as any).lastAutoTable.finalY + 15;
+    let depositStartY = (doc as any).lastAutoTable.finalY + 15;
+    
+    // Check if we need a new page for this section
+    if (depositStartY > doc.internal.pageSize.getHeight() - 50) {
+        doc.addPage();
+        depositStartY = 20; // Reset Y for new page
+    }
+
     doc.text('III. DETAIL MUTASI MASUK (TOP UP)', 20, depositStartY);
 
     autoTable(doc, {
@@ -163,11 +170,19 @@ export default function ReportsPage() {
       headStyles: { fillColor: [59, 130, 246] }, // blue-500
       styles: { fontSize: 8 },
       columnStyles: { 3: { halign: 'right' } },
-      margin: { left: 20, right: 20 }
+      margin: { left: 20, right: 20 },
+      pageBreak: 'auto'
     });
 
     // --- 4. DETAIL PER KATEGORI ---
-    const categoryStartY = (doc as any).lastAutoTable.finalY + 15;
+    let categoryStartY = (doc as any).lastAutoTable.finalY + 15;
+    
+    // Check if we need a new page for this section
+    if (categoryStartY > doc.internal.pageSize.getHeight() - 50) {
+        doc.addPage();
+        categoryStartY = 20; // Reset Y for new page
+    }
+
     doc.text('IV. PERFORMA KATEGORI PRODUK', 20, categoryStartY);
 
     autoTable(doc, {

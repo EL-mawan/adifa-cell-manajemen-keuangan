@@ -261,7 +261,7 @@ export default function DashboardLayout({
         </main>
       </div>
 
-      <div className="lg:hidden fixed bottom-6 left-6 right-6 bg-indigo-600 dark:bg-indigo-700 backdrop-blur-xl border border-white/20 flex justify-around items-center px-2 py-3 z-50 rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(79,70,229,0.4)]">
+      <div className="lg:hidden fixed bottom-6 left-2 right-2 bg-indigo-600 dark:bg-indigo-700 backdrop-blur-xl border border-white/20 flex justify-around items-center px-2 py-5 z-50 rounded-4xl shadow-[0_20px_50px_-12px_rgba(79,70,229,0.4)]">
         {bottomNavItems.map((item: any) => {
            const isActive = pathname === item.href;
            

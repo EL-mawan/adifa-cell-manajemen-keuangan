@@ -135,6 +135,7 @@ export default function ReportsPage() {
         ['Total Fee Adm', formatCurrency(reportData.summary.totalFee)],
         ['TOTAL KEUNTUNGAN BERSIH', formatCurrency(reportData.summary.totalProfit)],
         ['TOTAL MASUK (TOP UP SALDO)', formatCurrency(reportData.summary.totalDeposit)],
+        ['TOTAL BERSIH (PROFIT + TOP UP)', formatCurrency(reportData.summary.totalProfit + reportData.summary.totalDeposit)],
       ],
       theme: 'grid',
       headStyles: { fillColor: [16, 185, 129] }, // emerald-600

@@ -113,55 +113,66 @@ export async function POST(request: NextRequest) {
     const newBalance = user.balance + amount;
     const createdAt = date ? new Date(date) : new Date();
 
-    // Update user balance
-    await db.user.update({
-      where: { id: user.id },
-      data: { balance: newBalance },
-    });
+    // Use transaction for consistency
+    const result = await db.$transaction(async (tx) => {
+      // Update user balance using atomic increment
+      const updatedUser = await tx.user.update({
+        where: { id: userId },
+        data: { balance: { increment: amount } },
+      });
 
-    // Create balance log
-    const balanceLog = await db.balanceLog.create({
-      data: {
-        userId: user.id,
-        type: 'TOP_UP',
-        amount,
-        balanceBefore: user.balance,
-        balanceAfter: newBalance,
-        description: description || `Top up saldo Rp ${amount.toLocaleString('id-ID')}`,
-        createdAt,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+      const newBalance = updatedUser.balance;
+
+      // Create balance log
+      const balanceLog = await tx.balanceLog.create({
+        data: {
+          userId: userId,
+          type: 'TOP_UP',
+          amount,
+          balanceBefore: newBalance - amount,
+          balanceAfter: newBalance,
+          description: description || `Top up saldo Rp ${amount.toLocaleString('id-ID')}`,
+          createdAt,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    // Log activity
-    await db.activityLog.create({
-      data: {
-        userId: auth.user.userId,
-        action: 'TOP_UP',
-        module: 'BALANCE',
-        details: `Top up saldo Rp ${amount.toLocaleString('id-ID')} untuk ${user.name}`,
-        ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: request.headers.get('user-agent') || 'unknown',
-        createdAt,
-      },
+      // Log activity
+      await tx.activityLog.create({
+        data: {
+          userId: auth.user.userId,
+          action: 'TOP_UP',
+          module: 'BALANCE',
+          details: `Top up saldo Rp ${amount.toLocaleString('id-ID')} untuk ${user.name}`,
+          ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
+          userAgent: request.headers.get('user-agent') || 'unknown',
+          createdAt,
+        },
+      });
+
+      return { balanceLog, newBalance };
     });
 
     return NextResponse.json({
-      balanceLog,
-      newBalance: newBalance, // Return newBalance so the requester knows the result
+      balanceLog: result.balanceLog,
+      newBalance: result.newBalance,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Top up balance error:', error);
+    
+    // Return a more descriptive error if possible
+    const errorMessage = error?.message || 'Terjadi kesalahan saat melakukan top up saldo';
+    
     return NextResponse.json(
-      { error: 'Terjadi kesalahan saat melakukan top up saldo' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

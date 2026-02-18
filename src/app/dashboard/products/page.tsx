@@ -369,7 +369,7 @@ export default function ProductsPage() {
                         value={formData.basePrice}
                         onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
                         min="0"
-                        step="100"
+                        step="any"
                         required
                         disabled={isSubmitting}
                       />
@@ -384,7 +384,7 @@ export default function ProductsPage() {
                         value={formData.sellingPrice}
                         onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
                         min="0"
-                        step="100"
+                        step="any"
                         required
                         disabled={isSubmitting}
                       />

@@ -9,39 +9,67 @@ export const Logo: React.FC<LogoProps> = ({ className = "h-10 w-10", showText = 
   return (
     <div className="flex items-center gap-3">
       <div className={`relative ${className} flex items-center justify-center shrink-0`}>
-        {/* Modern Hexagonal Shape / Icon Container */}
-        <div className="absolute inset-0 bg-linear-to-br from-indigo-500 to-indigo-700 rounded-2xl rotate-6 shadow-lg shadow-indigo-200 dark:shadow-none transition-transform group-hover:rotate-12 duration-300"></div>
-        <div className="absolute inset-0 bg-zinc-900 border border-white/20 rounded-2xl shadow-inner shadow-white/10 dark:bg-zinc-100 flex items-center justify-center">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            className="w-2/3 h-2/3 text-white dark:text-zinc-900"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            {/* The stylized 'A' with a power/bolt element */}
-            <path
-              d="M12 4L4 20H8.5L10 16H14L15.5 20H20L12 4Z"
-              fill="currentColor"
-              className="opacity-20"
-            />
-            <path
-              d="M12 4.5L18.5 19H14.5L13.5 16.5H10.5L9.5 19H5.5L12 4.5ZM12.7 14.5L12 12.8L11.3 14.5H12.7Z"
-              fill="currentColor"
-            />
-            {/* Pulsing signal dot */}
-            <circle cx="12" cy="11" r="1.5" fill="currentColor" className="animate-pulse" />
-          </svg>
-        </div>
+        <svg
+          viewBox="0 0 100 100"
+          fill="none"
+          className="w-full h-full drop-shadow-sm"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+           {/* Background Circle (White/Transparent) */}
+           <circle cx="50" cy="50" r="48" className="fill-white dark:fill-zinc-900" />
+           
+           {/* Outer Circuit Ring (Blue) */}
+           <path 
+             d="M50 5 A45 45 0 1 1 49.9 5" 
+             className="stroke-[#0070C0] dark:stroke-[#3b82f6]" 
+             strokeWidth="6" 
+             strokeLinecap="round" 
+           />
+           {/* Circuit Nodes (Dots on Blue Ring) */}
+           <circle cx="50" cy="5" r="3" className="fill-white stroke-[#0070C0] dark:stroke-[#3b82f6]" strokeWidth="2" />
+           <circle cx="95" cy="50" r="3" className="fill-white stroke-[#0070C0] dark:stroke-[#3b82f6]" strokeWidth="2" />
+           <circle cx="50" cy="95" r="3" className="fill-white stroke-[#0070C0] dark:stroke-[#3b82f6]" strokeWidth="2" />
+           <circle cx="5" cy="50" r="3" className="fill-white stroke-[#0070C0] dark:stroke-[#3b82f6]" strokeWidth="2" />
+
+           {/* Inner Ring (Lime Green) */}
+           <path 
+             d="M50 12 A38 38 0 1 1 49.9 12" 
+             className="stroke-[#8CC63F] dark:stroke-[#a3e635]" 
+             strokeWidth="4" 
+             strokeLinecap="round"
+             opacity="0.9" 
+           />
+
+           {/* Signal Tower (Center) */}
+           {/* Base */}
+           <path 
+             d="M35 70 L65 70 L50 55 Z" 
+             className="fill-[#2c3e50] dark:fill-white" 
+           />
+           {/* Mast */}
+           <rect x="48" y="35" width="4" height="25" className="fill-[#8CC63F] dark:fill-[#a3e635]" rx="2" />
+           {/* Antenna Ball */}
+           <circle cx="50" cy="35" r="4" className="fill-[#8CC63F] dark:fill-[#a3e635]" />
+
+           {/* Signals (Blue Waves) */}
+           <path d="M35 45 Q30 35 35 25" className="stroke-[#0070C0] dark:stroke-[#3b82f6]" strokeWidth="4" strokeLinecap="round" fill="none" />
+           <path d="M28 50 Q20 35 28 20" className="stroke-[#0070C0] dark:stroke-[#3b82f6]" strokeWidth="4" strokeLinecap="round" fill="none" />
+           
+           <path d="M65 45 Q70 35 65 25" className="stroke-[#0070C0] dark:stroke-[#3b82f6]" strokeWidth="4" strokeLinecap="round" fill="none" />
+           <path d="M72 50 Q80 35 72 20" className="stroke-[#0070C0] dark:stroke-[#3b82f6]" strokeWidth="4" strokeLinecap="round" fill="none" />
+        </svg>
       </div>
       
       {showText && (
-        <div className="flex flex-col">
-          <span className="font-black text-xl tracking-tighter text-zinc-900 dark:text-zinc-50 leading-none">
-            ADIFA <span className="text-indigo-600">CELL</span>
+        <div className="flex flex-col justify-center">
+          <span className="font-black text-xl tracking-wide text-[#0070C0] dark:text-[#3b82f6] leading-none text-left">
+            ADIFA
           </span>
-          <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.2em] leading-none mt-1">
-            PPOB SYSTEM
-          </span>
+          <div className="flex items-center gap-1 leading-none mt-0.5">
+            <span className="font-bold text-sm text-[#2c3e50] dark:text-zinc-100 tracking-[0.2em] uppercase">
+              CELL
+            </span>
+          </div>
         </div>
       )}
     </div>

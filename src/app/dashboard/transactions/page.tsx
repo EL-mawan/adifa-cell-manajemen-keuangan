@@ -379,8 +379,8 @@ export default function TransactionsPage() {
                             <SelectItem value="FAILED">Gagal</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button variant="outline" onClick={fetchTransactions} className="basis-1/3 sm:w-10 h-12 sm:h-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200">
-                        <RefreshCw className="h-4 w-4" />
+                    <Button variant="outline" size="icon" onClick={fetchTransactions} className="h-12 sm:h-10 w-12 sm:w-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 shrink-0">
+                        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                     </Button>
                 </div>
             </div>

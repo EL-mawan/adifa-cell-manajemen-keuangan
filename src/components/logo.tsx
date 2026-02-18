@@ -20,44 +20,26 @@ export const Logo: React.FC<LogoProps> = ({ className = "h-10 w-10", showText = 
               <stop offset="0%" stopColor="#1E3A8A" />
               <stop offset="100%" stopColor="#8CC63F" />
             </linearGradient>
-            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-               <feGaussianBlur stdDeviation="2" result="blur" />
-               <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
           </defs>
 
-          {/* Background Ring - Shadow/Glow effect */}
+          {/* Background Ring */}
           <circle cx="200" cy="200" r="195" fill="white" className="dark:fill-zinc-900" />
 
           {/* Outer Circuit Ring (Blue) */}
           <circle cx="200" cy="200" r="185" stroke="#0070C0" strokeWidth="12" fill="none" />
           
-          {/* Circuit Details - Dots and Lines on Outer Ring */}
-          {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle, i) => {
-            const rad = (angle * Math.PI) / 180;
-            const x = 200 + 185 * Math.cos(rad);
-            const y = 200 + 185 * Math.sin(rad);
-            return (
-              <g key={i}>
-                <circle cx={x} cy={y} r="6" fill="white" stroke="#0070C0" strokeWidth="3" />
-                <path 
-                  d={`M ${200 + 170 * Math.cos(rad)} ${200 + 170 * Math.sin(rad)} L ${200 + 200 * Math.cos(rad)} ${200 + 200 * Math.sin(rad)}`}
-                  stroke="#0070C0" strokeWidth="2" opacity="0.6"
-                />
-              </g>
-            )
-          })}
+          {/* Circuit Details - 8 Nodes as per logo.svg */}
+          <g id="circuit-nodes">
+            {[
+              { x: 200, y: 15 }, { x: 385, y: 200 }, { x: 200, y: 385 }, { x: 15, y: 200 },
+              { x: 331, y: 69 }, { x: 331, y: 331 }, { x: 69, y: 331 }, { x: 69, y: 69 }
+            ].map((pos, i) => (
+              <circle key={i} cx={pos.x} cy={pos.y} r="6" fill="white" stroke="#0070C0" strokeWidth="3" />
+            ))}
+          </g>
 
           {/* Inner Ring (Lime Green) */}
           <circle cx="200" cy="200" r="160" stroke="#8CC63F" strokeWidth="8" fill="none" />
-          {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((angle, i) => {
-            const rad = (angle * Math.PI) / 180;
-            const x = 200 + 160 * Math.cos(rad);
-            const y = 200 + 160 * Math.sin(rad);
-            return (
-              <circle key={`inner-${i}`} cx={x} cy={y} r="5" fill="white" stroke="#8CC63F" strokeWidth="2" />
-            )
-          })}
 
           {/* Center Content: Signal Tower / Antenna */}
           <g transform="translate(100, 80) scale(0.5)">
@@ -81,9 +63,9 @@ export const Logo: React.FC<LogoProps> = ({ className = "h-10 w-10", showText = 
 
           {/* Integrated Text for when SVG is standing alone */}
           {!showText && (
-            <g transform="translate(200, 320)">
-              <text textAnchor="middle" x="0" y="0" fontFamily="sans-serif" fontWeight="900" fontSize="70" fill="url(#textGradient)">ADIFA</text>
-              <text textAnchor="middle" x="0" y="45" fontFamily="sans-serif" fontWeight="700" fontSize="30" fill="#2D3748" letterSpacing="5">CELL</text>
+            <g transform="translate(200, 315)">
+              <text textAnchor="middle" x="0" y="0" fontFamily="sans-serif" fontWeight="900" fontSize="65" fill="url(#textGradient)">ADIFA</text>
+              <text textAnchor="middle" x="0" y="40" fontFamily="sans-serif" fontWeight="700" fontSize="28" fill="#2D3748" letterSpacing="4">CELL</text>
             </g>
           )}
         </svg>

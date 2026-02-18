@@ -161,7 +161,7 @@ export default function BalancePage() {
       const data = await response.json();
       toast({
         title: editingLog ? 'Update Berhasil' : 'Top Up Berhasil',
-        description: `Saldo sekarang: Rp ${data.newBalance.toLocaleString('id-ID')}`,
+        description: `Saldo sekarang: Rp ${(data.newBalance || 0).toLocaleString('id-ID')}`,
       });
 
       // Reset form

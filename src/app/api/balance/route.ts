@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       balanceLog,
-      newBalance: (auth.user.userId === userId) ? newBalance : undefined, // Only return newBalance if it's for the same user
+      newBalance: newBalance, // Return newBalance so the requester knows the result
     });
   } catch (error) {
     console.error('Top up balance error:', error);

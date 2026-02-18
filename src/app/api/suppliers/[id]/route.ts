@@ -2,6 +2,43 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuth, requireRole } from '@/lib/auth-api';
 import { db } from '@/lib/db';
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const auth = await verifyAuth(request);
+
+  if (auth.error) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const hasAccess = requireRole(['ADMIN'])(auth.user);
+  if (!hasAccess) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  try {
+    const { id } = await params;
+    const supplier = await db.supplier.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: { products: true }
+        }
+      }
+    });
+
+    if (!supplier) {
+      return NextResponse.json({ error: 'Supplier tidak ditemukan' }, { status: 404 });
+    }
+
+    return NextResponse.json(supplier);
+  } catch (error) {
+    console.error('Get supplier error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

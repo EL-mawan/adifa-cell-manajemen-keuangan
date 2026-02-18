@@ -2,6 +2,45 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuth, requireRole } from '@/lib/auth-api';
 import { db } from '@/lib/db';
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const auth = await verifyAuth(request);
+
+  if (auth.error) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  try {
+    const { id } = await params;
+    const product = await db.product.findUnique({
+      where: { id },
+      include: {
+        supplier: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+          },
+        },
+      },
+    });
+
+    if (!product) {
+      return NextResponse.json({ error: 'Produk tidak ditemukan' }, { status: 404 });
+    }
+
+    return NextResponse.json(product);
+  } catch (error) {
+    console.error('Get product error:', error);
+    return NextResponse.json(
+      { error: 'Terjadi kesalahan saat mengambil data produk' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -25,24 +64,13 @@ export async function PATCH(
     const body = await request.json();
     const { code, name, category, supplierId, basePrice, sellingPrice, fee, minBalance, isActive } = body;
 
-    // Calculate profit if prices change
-    let profit: number | undefined = undefined;
-    if (basePrice !== undefined && sellingPrice !== undefined) {
-      profit = parseFloat(sellingPrice) - parseFloat(basePrice);
-    } else if (basePrice !== undefined) {
-      // Fetch existing sellingPrice? Or assume provided in body?
-      // Better to recalculate profit only if both provided to avoid stale data
-    }
-    
-    // For simplicity, assume all fields sent or handle partial updates carefully.
-    // Let's recalculate profit based on new values or existing ones if provided.
-    
-    // Check existing product for partial update
+    // Check existing product
     const existingProduct = await db.product.findUnique({ where: { id } });
     if (!existingProduct) {
        return NextResponse.json({ error: 'Produk tidak ditemukan' }, { status: 404 });
     }
 
+    // Recalculate profit if any price-related fields change
     const newBasePrice = basePrice !== undefined ? parseFloat(basePrice) : existingProduct.basePrice;
     const newSellingPrice = sellingPrice !== undefined ? parseFloat(sellingPrice) : existingProduct.sellingPrice;
     const newFee = fee !== undefined ? parseFloat(fee) : existingProduct.fee;
@@ -88,6 +116,7 @@ export async function PATCH(
     );
   }
 }
+
 
 export async function DELETE(
   request: NextRequest,

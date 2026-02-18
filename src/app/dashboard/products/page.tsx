@@ -123,9 +123,6 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchProducts();
     fetchSuppliers();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchProducts, 30000);
-    return () => clearInterval(interval);
   }, [token, categoryFilter, searchTerm]);
 
   const handleSubmit = async (e: React.FormEvent) => {

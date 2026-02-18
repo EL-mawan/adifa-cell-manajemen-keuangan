@@ -119,6 +119,9 @@ export default function TransactionsPage() {
 
   useEffect(() => {
     fetchTransactions();
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchTransactions, 30000);
+    return () => clearInterval(interval);
   }, [token, page, statusFilter]);
 
   const handleEdit = (trx: Transaction) => {
@@ -369,7 +372,7 @@ export default function TransactionsPage() {
                 </div>
                 <div className="flex gap-2 order-3 sm:order-2">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="flex-1 sm:w-[140px] h-12 sm:h-10 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
+                        <SelectTrigger className="w-full sm:w-[140px] h-12 sm:h-10 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent className="rounded-2xl">
@@ -379,9 +382,6 @@ export default function TransactionsPage() {
                             <SelectItem value="FAILED">Gagal</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button variant="outline" size="icon" onClick={fetchTransactions} className="h-12 sm:h-10 w-12 sm:w-10 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 shrink-0 shadow-sm transition-all active:scale-95">
-                        <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                    </Button>
                 </div>
             </div>
 

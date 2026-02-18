@@ -123,6 +123,9 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchProducts();
     fetchSuppliers();
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(fetchProducts, 30000);
+    return () => clearInterval(interval);
   }, [token, categoryFilter, searchTerm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -457,7 +460,7 @@ export default function ProductsPage() {
             </div>
             <div className="flex gap-2 order-3 sm:order-2">
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="flex-1 sm:w-[180px] h-12 sm:h-10 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
+                <SelectTrigger className="w-full sm:w-[180px] h-12 sm:h-10 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <SelectValue placeholder="Kategori" />
                 </SelectTrigger>
                 <SelectContent className="rounded-2xl">
@@ -472,9 +475,6 @@ export default function ProductsPage() {
                     ))}
                 </SelectContent>
                 </Select>
-                <Button variant="outline" size="icon" onClick={fetchProducts} className="h-12 sm:h-10 w-12 sm:w-10 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 shrink-0 shadow-sm transition-all active:scale-95">
-                  <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                </Button>
             </div>
           </div>
 

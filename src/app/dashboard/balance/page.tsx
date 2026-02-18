@@ -536,33 +536,37 @@ export default function BalancePage() {
                       <TableCell className="text-right pr-6">
                         <div className="flex items-center justify-end gap-3">
                           <span className="text-sm font-black text-zinc-900 dark:text-zinc-50">{formatCurrency(log.balanceAfter)}</span>
-                          <Dialog>
-                            <DialogTrigger asChild>
+                          {log.type !== 'TRANSACTION' && (
+                            <>
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className="h-7 w-7 rounded-lg opacity-0 group-hover:opacity-100 bg-zinc-100 dark:bg-zinc-800"
+                                    onClick={() => {
+                                      setEditingLog(log);
+                                      setTopUpAmount(log.amount.toString());
+                                      setTopUpDescription(log.description || '');
+                                      setTopUpDate(new Date(log.createdAt).toISOString().split('T')[0]);
+                                      setTargetUserId(log.user.id);
+                                      setIsDialogOpen(true);
+                                    }}
+                                  >
+                                    <MoreHorizontal className="h-3.5 w-3.5 text-zinc-500" />
+                                  </Button>
+                                </DialogTrigger>
+                              </Dialog>
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
-                                className="h-7 w-7 rounded-lg opacity-0 group-hover:opacity-100 bg-zinc-100 dark:bg-zinc-800"
-                                onClick={() => {
-                                  setEditingLog(log);
-                                  setTopUpAmount(log.amount.toString());
-                                  setTopUpDescription(log.description || '');
-                                  setTopUpDate(new Date(log.createdAt).toISOString().split('T')[0]);
-                                  setTargetUserId(log.user.id);
-                                  setIsDialogOpen(true);
-                                }}
+                                className="h-7 w-7 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 text-zinc-400"
+                                onClick={() => handleDeleteLog(log.id)}
                               >
-                                <MoreHorizontal className="h-3.5 w-3.5 text-zinc-500" />
+                                <Plus className="h-3.5 w-3.5 rotate-45" />
                               </Button>
-                            </DialogTrigger>
-                          </Dialog>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 text-zinc-400"
-                            onClick={() => handleDeleteLog(log.id)}
-                          >
-                            <Plus className="h-3.5 w-3.5 rotate-45" />
-                          </Button>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -609,31 +613,33 @@ export default function BalancePage() {
                                 </div>
                              </div>
                         </div>
-                         <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-zinc-50 dark:border-zinc-800">
-                             <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-9 px-4 rounded-xl text-blue-600 font-bold hover:bg-blue-50"
-                                onClick={() => {
-                                  setEditingLog(log);
-                                  setTopUpAmount(log.amount.toString());
-                                  setTopUpDescription(log.description || '');
-                                  setTopUpDate(new Date(log.createdAt).toISOString().split('T')[0]);
-                                  setTargetUserId(log.user.id);
-                                  setIsDialogOpen(true);
-                                }}
-                             >
-                                Edit
-                             </Button>
-                             <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-9 px-4 rounded-xl text-red-600 font-bold hover:bg-red-50"
-                                onClick={() => handleDeleteLog(log.id)}
-                             >
-                                Hapus
-                             </Button>
-                         </div>
+                         {log.type !== 'TRANSACTION' && (
+                           <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-zinc-50 dark:border-zinc-800">
+                               <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-9 px-4 rounded-xl text-blue-600 font-bold hover:bg-blue-50"
+                                  onClick={() => {
+                                    setEditingLog(log);
+                                    setTopUpAmount(log.amount.toString());
+                                    setTopUpDescription(log.description || '');
+                                    setTopUpDate(new Date(log.createdAt).toISOString().split('T')[0]);
+                                    setTargetUserId(log.user.id);
+                                    setIsDialogOpen(true);
+                                  }}
+                               >
+                                  Edit
+                               </Button>
+                               <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  className="h-9 px-4 rounded-xl text-red-600 font-bold hover:bg-red-50"
+                                  onClick={() => handleDeleteLog(log.id)}
+                               >
+                                  Hapus
+                               </Button>
+                           </div>
+                         )}
                          {/* Subtle background detail */}
                          <div className={`absolute top-0 right-0 w-1 h-full ${log.type === 'TOP_UP' || log.type === 'REFUND' ? 'bg-emerald-500' : 'bg-indigo-500'} opacity-20`}></div>
                      </div>

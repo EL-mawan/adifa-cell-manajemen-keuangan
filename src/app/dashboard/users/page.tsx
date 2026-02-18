@@ -340,7 +340,7 @@ export default function UsersPage() {
                     className="pl-9 w-full h-12 lg:h-10 rounded-xl bg-white dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 shadow-sm"
                 />
             </div>
-            <Button variant="outline" size="icon" onClick={fetchUsers} className="rounded-xl h-12 sm:h-10 w-12 sm:w-10 border-zinc-100 bg-white dark:bg-zinc-800 shadow-sm shrink-0">
+            <Button variant="outline" size="icon" onClick={fetchUsers} className="rounded-2xl h-12 sm:h-10 w-12 sm:w-10 border-zinc-100 bg-white dark:bg-zinc-800 shadow-sm shrink-0 transition-all active:scale-95">
                 <RefreshCw className={`h-4 w-4 text-zinc-600 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
           </div>

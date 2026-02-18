@@ -369,17 +369,17 @@ export default function TransactionsPage() {
                 </div>
                 <div className="flex gap-2 order-3 sm:order-2">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="basis-2/3 sm:w-[140px] h-12 sm:h-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                        <SelectTrigger className="flex-1 sm:w-[140px] h-12 sm:h-10 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ALL">Semua</SelectItem>
+                        <SelectContent className="rounded-2xl">
+                            <SelectItem value="ALL">Semua Status</SelectItem>
                             <SelectItem value="SUCCESS">Sukses</SelectItem>
                             <SelectItem value="PENDING">Pending</SelectItem>
                             <SelectItem value="FAILED">Gagal</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button variant="outline" size="icon" onClick={fetchTransactions} className="h-12 sm:h-10 w-12 sm:w-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 shrink-0">
+                    <Button variant="outline" size="icon" onClick={fetchTransactions} className="h-12 sm:h-10 w-12 sm:w-10 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 shrink-0 shadow-sm transition-all active:scale-95">
                         <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                     </Button>
                 </div>

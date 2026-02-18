@@ -73,10 +73,10 @@ export const Logo: React.FC<LogoProps> = ({ className = "h-10 w-10", showText = 
       
       {showText && (
         <div className="flex flex-col justify-center">
-          <span className="font-black text-xl sm:text-3xl tracking-tight bg-linear-to-b from-blue-900 to-lime-500 bg-clip-text text-transparent leading-none">
+          <span className="font-black text-2xl sm:text-3xl tracking-tight bg-linear-to-b from-blue-900 to-lime-500 bg-clip-text text-transparent leading-none">
             ADIFA
           </span>
-          <span className="font-bold text-[10px] sm:text-lg text-zinc-700 dark:text-zinc-300 tracking-widest uppercase leading-none mt-0.5 sm:mt-1 text-center">
+          <span className="font-bold text-xs sm:text-lg text-zinc-700 dark:text-zinc-300 tracking-widest uppercase leading-none mt-0.5 sm:mt-1 text-center">
             CELL
           </span>
         </div>

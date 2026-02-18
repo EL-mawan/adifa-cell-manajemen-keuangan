@@ -145,7 +145,7 @@ export default function LoginPage() {
               transition={{ delay: 0.2 }}
               className="flex justify-center group"
             >
-              <Logo className="h-16 w-16" />
+              <Logo className="h-32 w-32" variant="stacked" />
             </motion.div>
             <motion.div
               initial={{ opacity: 0 }}

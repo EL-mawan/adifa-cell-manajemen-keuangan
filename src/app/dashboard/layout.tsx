@@ -128,8 +128,8 @@ export default function DashboardLayout({
     <div className="flex flex-col h-full bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800">
       {/* Brand Logo */}
       <div className="p-8">
-        <Link href="/dashboard" className="group">
-          <Logo />
+        <Link href="/dashboard" className="group block">
+          <Logo className="h-20 w-20 mx-auto" variant="stacked" />
         </Link>
       </div>
 

@@ -395,7 +395,7 @@ export default function TransactionsPage() {
                             <TableHead>Tanggal</TableHead>
                             <TableHead>User</TableHead>
                             <TableHead>Produk</TableHead>
-                            <TableHead>No. Pelanggan</TableHead>
+                            <TableHead>Pelanggan</TableHead>
                             <TableHead>Nominal</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead className="text-right">Aksi</TableHead>

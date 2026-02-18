@@ -206,153 +206,154 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6 pb-20 lg:pb-0">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Admin Adifa Cell</h1>
-          <p className="text-zinc-500 mt-1 hidden md:block">
-            Kelola daftar administrator sistem
-          </p>
-        </div>
-
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-            setIsDialogOpen(open);
-            if (!open) resetForm();
-        }}>
-            <DialogTrigger asChild>
-                <Button className="gap-2 rounded-xl h-10 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm hover:shadow-indigo-200">
-                    <UserPlus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Tambah Admin</span>
-                    <span className="sm:hidden">Tambah</span>
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md rounded-2xl">
-                <DialogHeader>
-                    <DialogTitle>{editingId ? 'Edit Data Admin' : 'Admin Baru'}</DialogTitle>
-                    <DialogDescription>
-                        Lengkapi form berikut sesuai kolom data user.
-                    </DialogDescription>
-                </DialogHeader>
-                 <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-                    {/* Tanggal */}
-                    <div className="space-y-2">
-                        <Label htmlFor="date" className="text-zinc-600">Tanggal Daftar</Label>
-                        <Input 
-                            id="date" 
-                            type="date"
-                            className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all"
-                            value={formData.date}
-                            onChange={(e) => setFormData({...formData, date: e.target.value})}
-                            required
-                        />
-                    </div>
-                    
-                    {/* 1. Nama */}
-                    <div className="space-y-2">
-                        <Label htmlFor="name" className="text-zinc-600">Nama Lengkap</Label>
-                        <Input 
-                            id="name" 
-                            className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all"
-                            value={formData.name}
-                            onChange={(e) => setFormData({...formData, name: e.target.value})}
-                            required
-                        />
-                    </div>
-
-                    {/* 2. Email */}
-                    <div className="space-y-2">
-                        <Label htmlFor="email" className="text-zinc-600">Email Login</Label>
-                        <Input 
-                            id="email" 
-                            type="email"
-                            className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all"
-                            value={formData.email}
-                            onChange={(e) => setFormData({...formData, email: e.target.value})}
-                            required
-                        />
-                    </div>
-
-                    {/* 3. Saldo */}
-                    <div className="space-y-2">
-                        <Label htmlFor="balance" className="text-zinc-600">Saldo Awal (Rp)</Label>
-                        <Input 
-                            id="balance"
-                            type="number"
-                            className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all"
-                            value={formData.balance}
-                            onChange={(e) => setFormData({...formData, balance: e.target.value})}
-                        />
-                    </div>
-
-                    {/* 4. Status (Switch) */}
-                    <div className="flex items-center justify-between p-3 rounded-lg border bg-zinc-50">
-                        <div className="space-y-0.5">
-                            <Label htmlFor="isActive" className="text-base">Status Akun</Label>
-                            <p className="text-xs text-muted-foreground">
-                                {formData.isActive ? 'Admin dapat login' : 'Akses ditangguhkan'}
-                            </p>
-                        </div>
-                        <Switch 
-                            id="isActive"
-                            checked={formData.isActive}
-                            onCheckedChange={(checked) => setFormData({...formData, isActive: checked})}
-                        />
-                    </div>
-
-                    {/* 5. Password (Terakhir/Privasi) */}
-                    <div className="space-y-2 pt-2 border-t mt-2">
-                        <Label htmlFor="password" className="text-zinc-600">Password {editingId && '(Opsional)'}</Label>
-                        <Input 
-                            id="password" 
-                            type="password"
-                            className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all"
-                            placeholder={editingId ? "Biarkan kosong jika tetap" : "Password baru"}
-                            value={formData.password}
-                            onChange={(e) => setFormData({...formData, password: e.target.value})}
-                            required={!editingId}
-                        />
-                    </div>
-                
-                    <div className="flex flex-col gap-2 mt-4">
-                        <Button type="submit" className="w-full rounded-xl h-10 font-bold bg-indigo-600 hover:bg-indigo-700 text-white" disabled={isSubmitting}>
-                            {isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Buat Akun Admin')}
-                        </Button>
-                        <Button 
-                            type="button" 
-                            variant="ghost" 
-                            className="w-full rounded-xl h-10 font-bold text-zinc-400 hover:text-zinc-600" 
-                            onClick={() => setIsDialogOpen(false)}
-                            disabled={isSubmitting}
-                        >
-                            Batal
-                        </Button>
-                    </div>
-                </form>
-            </DialogContent>
-        </Dialog>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Admin Adifa Cell</h1>
+        <p className="text-zinc-500 mt-1 hidden md:block">
+          Kelola daftar administrator sistem
+        </p>
       </div>
+
+       {/* Action Bar */}
+       <div className="flex flex-col sm:flex-row gap-4 mb-6 px-1 lg:px-0">
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) resetForm();
+          }}>
+              <DialogTrigger asChild>
+                  <Button className="w-full sm:w-auto h-12 sm:h-auto gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100 dark:shadow-none font-bold text-base sm:text-sm order-first sm:order-last px-6 transition-all active:scale-95">
+                      <UserPlus className="h-5 w-5 sm:h-4 sm:w-4" />
+                      <span>Tambah Admin Baru</span>
+                  </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md rounded-2xl">
+                  <DialogHeader>
+                      <DialogTitle>{editingId ? 'Edit Data Admin' : 'Admin Baru'}</DialogTitle>
+                      <DialogDescription>
+                          Lengkapi form berikut sesuai kolom data user.
+                      </DialogDescription>
+                  </DialogHeader>
+                   <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+                      {/* Tanggal */}
+                      <div className="space-y-2">
+                          <Label htmlFor="date" className="text-zinc-600">Tanggal Daftar</Label>
+                          <Input 
+                              id="date" 
+                              type="date"
+                              className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all h-11"
+                              value={formData.date}
+                              onChange={(e) => setFormData({...formData, date: e.target.value})}
+                              required
+                          />
+                      </div>
+                      
+                      {/* 1. Nama */}
+                      <div className="space-y-2">
+                          <Label htmlFor="name" className="text-zinc-600">Nama Lengkap</Label>
+                          <Input 
+                              id="name" 
+                              className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all h-11"
+                              value={formData.name}
+                              onChange={(e) => setFormData({...formData, name: e.target.value})}
+                              required
+                          />
+                      </div>
+
+                      {/* 2. Email */}
+                      <div className="space-y-2">
+                          <Label htmlFor="email" className="text-zinc-600">Email Login</Label>
+                          <Input 
+                              id="email" 
+                              type="email"
+                              className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all h-11"
+                              value={formData.email}
+                              onChange={(e) => setFormData({...formData, email: e.target.value})}
+                              required
+                          />
+                      </div>
+
+                      {/* 3. Saldo */}
+                      <div className="space-y-2">
+                          <Label htmlFor="balance" className="text-zinc-600">Saldo Awal (Rp)</Label>
+                          <Input 
+                              id="balance"
+                              type="number"
+                              className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all h-11"
+                              value={formData.balance}
+                              onChange={(e) => setFormData({...formData, balance: e.target.value})}
+                          />
+                      </div>
+
+                      {/* 4. Status (Switch) */}
+                      <div className="flex items-center justify-between p-3 rounded-lg border bg-zinc-50">
+                          <div className="space-y-0.5">
+                              <Label htmlFor="isActive" className="text-base">Status Akun</Label>
+                              <p className="text-xs text-muted-foreground">
+                                  {formData.isActive ? 'Admin dapat login' : 'Akses ditangguhkan'}
+                              </p>
+                          </div>
+                          <Switch 
+                              id="isActive"
+                              checked={formData.isActive}
+                              onCheckedChange={(checked) => setFormData({...formData, isActive: checked})}
+                          />
+                      </div>
+
+                      {/* 5. Password (Terakhir/Privasi) */}
+                      <div className="space-y-2 pt-2 border-t mt-2">
+                          <Label htmlFor="password" className="text-zinc-600">Password {editingId && '(Opsional)'}</Label>
+                          <Input 
+                              id="password" 
+                              type="password"
+                              className="rounded-xl bg-zinc-50 border-zinc-200 focus:bg-white transition-all h-11"
+                              placeholder={editingId ? "Biarkan kosong jika tetap" : "Password baru"}
+                              value={formData.password}
+                              onChange={(e) => setFormData({...formData, password: e.target.value})}
+                              required={!editingId}
+                          />
+                      </div>
+                  
+                      <div className="flex flex-col gap-2 mt-4">
+                          <Button type="submit" className="w-full rounded-xl h-11 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg" disabled={isSubmitting}>
+                              {isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Buat Akun Admin')}
+                          </Button>
+                          <Button 
+                              type="button" 
+                              variant="ghost" 
+                              className="w-full rounded-xl h-11 font-bold text-zinc-400" 
+                              onClick={() => setIsDialogOpen(false)}
+                              disabled={isSubmitting}
+                          >
+                              Batal
+                          </Button>
+                      </div>
+                  </form>
+              </DialogContent>
+          </Dialog>
+
+          <div className="flex-1 flex gap-2 order-2 sm:order-first">
+            <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                    placeholder="Cari admin..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-9 w-full h-12 lg:h-10 rounded-xl bg-white dark:bg-zinc-800 border-zinc-100 dark:border-zinc-700 shadow-sm"
+                />
+            </div>
+            <Button variant="outline" size="icon" onClick={fetchUsers} className="rounded-xl h-12 w-12 sm:h-10 sm:w-10 border-zinc-100 bg-white dark:bg-zinc-800 shadow-sm">
+                <RefreshCw className={`h-4 w-4 text-zinc-600 ${isLoading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
+       </div>
 
        {/* Filters & Content */}
        <Card className="rounded-2xl border-none shadow-sm bg-white dark:bg-zinc-900 overflow-hidden">
-        <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 gap-4">
+        <CardHeader className="flex-col sm:flex-row items-start sm:items-center justify-between pb-4 gap-4 hidden md:flex">
           <div>
             <CardTitle className="text-lg font-bold">Daftar Admin</CardTitle>
             <CardDescription>
               {filteredUsers.length} akun terdaftar
             </CardDescription>
-          </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-              <div className="relative flex-1 sm:flex-initial">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                    placeholder="Cari..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 w-full sm:w-[200px] h-9 rounded-xl bg-zinc-100 border-none dark:bg-zinc-800"
-                />
-              </div>
-              <Button variant="outline" size="icon" onClick={fetchUsers} className="rounded-xl h-9 w-9 border-zinc-200 bg-transparent hover:bg-zinc-100">
-                  <RefreshCw className="h-4 w-4 text-zinc-600" />
-              </Button>
           </div>
         </CardHeader>
         <CardContent className="p-0">

@@ -254,211 +254,210 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-6 pb-20 lg:pb-0">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Produk PPOB</h1>
-          <p className="text-muted-foreground mt-1 text-sm hidden md:block">
-            Kelola produk PPOB yang tersedia
-          </p>
-        </div>
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-          setIsDialogOpen(open);
-          if (!open) resetForm();
-        }}>
-          <DialogTrigger asChild>
-            <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Tambah Produk</span>
-              <span className="sm:hidden">Baru</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
-            <DialogHeader>
-              <DialogTitle>{editingId ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
-              <DialogDescription>
-                Masukkan detail produk PPOB baru
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="code">Kode Produk *</Label>
-                  <Input
-                    className="rounded-xl"
-                    id="code"
-                    placeholder="Contoh: TSEL10"
-                    value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                    required
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="category">Kategori *</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) => setFormData({ ...formData, category: value })}
-                    required
-                    disabled={isSubmitting}
-                  >
-                    <SelectTrigger id="category" className="rounded-xl">
-                      <SelectValue placeholder="Pilih kategori" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CATEGORIES.map((cat) => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          <div className="flex items-center gap-2">
-                            <cat.icon className="h-4 w-4" />
-                            {cat.label}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="name">Nama Produk *</Label>
-                <Input
-                  className="rounded-xl"
-                  id="name"
-                  placeholder="Contoh: Telkomsel 10.000"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="supplier">Supplier *</Label>
-                <Select
-                  value={formData.supplierId}
-                  onValueChange={(value) => setFormData({ ...formData, supplierId: value })}
-                  required
-                  disabled={isSubmitting}
-                >
-                  <SelectTrigger id="supplier" className="rounded-xl">
-                    <SelectValue placeholder="Pilih supplier" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {suppliers.map((supplier) => (
-                      <SelectItem key={supplier.id} value={supplier.id}>
-                        {supplier.name} ({supplier.code})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="basePrice">Harga Modal (Rp) *</Label>
-                  <Input
-                    className="rounded-xl"
-                    id="basePrice"
-                    type="number"
-                    placeholder="10000"
-                    value={formData.basePrice}
-                    onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
-                    min="0"
-                    step="100"
-                    required
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="sellingPrice">Harga Jual (Rp) *</Label>
-                  <Input
-                    className="rounded-xl"
-                    id="sellingPrice"
-                    type="number"
-                    placeholder="10500"
-                    value={formData.sellingPrice}
-                    onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
-                    min="0"
-                    step="100"
-                    required
-                    disabled={isSubmitting}
-                  />
-                </div>
-              </div>
-
-              {/* Preview */}
-              {formData.basePrice && formData.sellingPrice && (
-                <div className="bg-muted p-4 rounded-xl space-y-2 text-sm border shadow-sm dark:bg-zinc-800/40">
-                  <p className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-emerald-500" />
-                    Preview Profit & Total
-                  </p>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Harga Modal:</span>
-                    <span className="font-mono">{formatCurrency(parseFloat(formData.basePrice) || 0)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Harga Jual Dasar:</span>
-                    <span className="font-mono">{formatCurrency(parseFloat(formData.sellingPrice) || 0)}</span>
-                  </div>
-                  <div className="flex justify-between border-b pb-2">
-                    <span className="text-muted-foreground">Fee Adm:</span>
-                    <span className="font-mono text-indigo-600 font-bold">+ {formatCurrency(parseFloat(formData.fee) || 0)}</span>
-                  </div>
-                  <div className="flex justify-between pt-1">
-                    <span className="font-bold">Total Pembayaran:</span>
-                    <span className="font-black text-blue-600">
-                        {formatCurrency((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0))}
-                    </span>
-                  </div>
-                  <div className="flex justify-between font-black text-emerald-600 border-t pt-2 mt-2 bg-emerald-50 dark:bg-emerald-950/20 px-2 rounded-lg py-1">
-                    <span>Net Profit:</span>
-                    <span>
-                      {formatCurrency(
-                        ((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0)) - (parseFloat(formData.basePrice) || 0)
-                      )}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-col gap-2 pt-2">
-                <Button
-                  type="submit"
-                  className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 h-11 font-bold"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Simpan Produk')}
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full rounded-xl h-11 font-bold text-zinc-400 hover:text-zinc-600"
-                  onClick={() => setIsDialogOpen(false)}
-                  disabled={isSubmitting}
-                >
-                  Batal
-                </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">Produk PPOB</h1>
+        <p className="text-muted-foreground mt-1 text-sm hidden md:block">
+          Kelola produk PPOB yang tersedia
+        </p>
       </div>
 
       <Card className="border-none shadow-none bg-transparent">
         <CardContent className="p-0">
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="flex-1 relative">
+            {/* Action Button - Large on Mobile, Above Search */}
+            <Dialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) resetForm();
+            }}>
+              <DialogTrigger asChild>
+                <Button className="w-full sm:w-auto h-12 sm:h-auto gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none font-bold text-base sm:text-sm order-first sm:order-last px-6">
+                  <Plus className="h-5 w-5 sm:h-4 sm:w-4" />
+                  <span>Tambah Produk Baru</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
+                <DialogHeader>
+                  <DialogTitle>{editingId ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
+                  <DialogDescription>
+                    Masukkan detail produk PPOB baru
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="code">Kode Produk *</Label>
+                      <Input
+                        className="rounded-xl"
+                        id="code"
+                        placeholder="Contoh: TSEL10"
+                        value={formData.code}
+                        onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                        required
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Kategori *</Label>
+                      <Select
+                        value={formData.category}
+                        onValueChange={(value) => setFormData({ ...formData, category: value })}
+                        required
+                        disabled={isSubmitting}
+                      >
+                        <SelectTrigger id="category" className="rounded-xl">
+                          <SelectValue placeholder="Pilih kategori" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CATEGORIES.map((cat) => (
+                            <SelectItem key={cat.value} value={cat.value}>
+                              <div className="flex items-center gap-2">
+                                <cat.icon className="h-4 w-4" />
+                                {cat.label}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Nama Produk *</Label>
+                    <Input
+                      className="rounded-xl"
+                      id="name"
+                      placeholder="Contoh: Telkomsel 10.000"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="supplier">Supplier *</Label>
+                    <Select
+                      value={formData.supplierId}
+                      onValueChange={(value) => setFormData({ ...formData, supplierId: value })}
+                      required
+                      disabled={isSubmitting}
+                    >
+                      <SelectTrigger id="supplier" className="rounded-xl">
+                        <SelectValue placeholder="Pilih supplier" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {suppliers.map((supplier) => (
+                          <SelectItem key={supplier.id} value={supplier.id}>
+                            {supplier.name} ({supplier.code})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="basePrice">Harga Modal (Rp) *</Label>
+                      <Input
+                        className="rounded-xl"
+                        id="basePrice"
+                        type="number"
+                        placeholder="10000"
+                        value={formData.basePrice}
+                        onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
+                        min="0"
+                        step="100"
+                        required
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="sellingPrice">Harga Jual (Rp) *</Label>
+                      <Input
+                        className="rounded-xl"
+                        id="sellingPrice"
+                        type="number"
+                        placeholder="10500"
+                        value={formData.sellingPrice}
+                        onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
+                        min="0"
+                        step="100"
+                        required
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Preview */}
+                  {formData.basePrice && formData.sellingPrice && (
+                    <div className="bg-muted p-4 rounded-xl space-y-2 text-sm border shadow-sm dark:bg-zinc-800/40">
+                      <p className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 mb-2">
+                        <TrendingUp className="h-4 w-4 text-emerald-500" />
+                        Preview Profit & Total
+                      </p>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Harga Modal:</span>
+                        <span className="font-mono">{formatCurrency(parseFloat(formData.basePrice) || 0)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Harga Jual Dasar:</span>
+                        <span className="font-mono">{formatCurrency(parseFloat(formData.sellingPrice) || 0)}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="text-muted-foreground">Fee Adm:</span>
+                        <span className="font-mono text-indigo-600 font-bold">+ {formatCurrency(parseFloat(formData.fee) || 0)}</span>
+                      </div>
+                      <div className="flex justify-between pt-1">
+                        <span className="font-bold">Total Pembayaran:</span>
+                        <span className="font-black text-blue-600">
+                            {formatCurrency((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0))}
+                        </span>
+                      </div>
+                      <div className="flex justify-between font-black text-emerald-600 border-t pt-2 mt-2 bg-emerald-50 dark:bg-emerald-950/20 px-2 rounded-lg py-1">
+                        <span>Net Profit:</span>
+                        <span>
+                          {formatCurrency(
+                            ((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0)) - (parseFloat(formData.basePrice) || 0)
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-2 pt-2">
+                    <Button
+                      type="submit"
+                      className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 h-11 font-bold"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Simpan Produk')}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="w-full rounded-xl h-11 font-bold text-zinc-400 hover:text-zinc-600"
+                      onClick={() => setIsDialogOpen(false)}
+                      disabled={isSubmitting}
+                    >
+                      Batal
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            <div className="flex-1 relative order-2 sm:order-first">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Cari nama atau kode produk..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
+                  className="h-12 sm:h-10 pl-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
                 />
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 order-3 sm:order-2">
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger className="w-[180px] rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                <SelectTrigger className="basis-2/3 sm:w-[180px] h-12 sm:h-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
                     <SelectValue placeholder="Kategori" />
                 </SelectTrigger>
                 <SelectContent>
@@ -470,11 +469,12 @@ export default function ProductsPage() {
                     ))}
                 </SelectContent>
                 </Select>
-                <Button variant="outline" size="icon" onClick={fetchProducts} className="rounded-xl bg-white dark:bg-zinc-900 border-zinc-200">
+                <Button variant="outline" size="icon" onClick={fetchProducts} className="basis-1/3 sm:w-10 h-12 sm:h-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200">
                 <RefreshCw className="h-4 w-4" />
                 </Button>
             </div>
           </div>
+
 
           {/* Desktop Table View */}
           <div className="hidden md:block rounded-2xl border bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">

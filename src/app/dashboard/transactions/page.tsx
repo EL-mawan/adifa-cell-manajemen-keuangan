@@ -226,151 +226,150 @@ export default function TransactionsPage() {
 
   return (
     <div className="space-y-6 pb-20 lg:pb-0">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold font-sans tracking-tight">Transaksi</h1>
-          <p className="text-muted-foreground mt-1 text-sm hidden md:block">
-            Pantau dan kelola semua transaksi
-          </p>
-        </div>
-
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-            <DialogTrigger asChild>
-                <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none">
-                    <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">Transaksi Baru</span>
-                    <span className="sm:hidden">Baru</span>
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md rounded-2xl">
-                <DialogHeader>
-                    <DialogTitle>Buat Transaksi Baru</DialogTitle>
-                    <DialogDescription>Input manual transaksi PPOB</DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleCreate} className="space-y-4 pt-2">
-                    <div className="space-y-2">
-                        <Label>Tanggal Transaksi</Label>
-                        <Input 
-                            type="date"
-                            className="rounded-xl"
-                            value={newTrx.date}
-                            onChange={(e) => setNewTrx({...newTrx, date: e.target.value})} 
-                            required
-                        />
-                    </div>
-                    <div className="space-y-2">
-                         <Label>Produk</Label>
-                         <Select 
-                            value={newTrx.productId} 
-                            onValueChange={(val) => {
-                                setNewTrx({...newTrx, productId: val});
-                                const prod = products.find(p => p.id === val);
-                                setSelectedProduct(prod || null);
-                            }}
-                         >
-                            <SelectTrigger className="rounded-xl">
-                                <SelectValue placeholder="Pilih Produk..." />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-[200px]">
-                                {products.map((p) => (
-                                    <SelectItem key={p.id} value={p.id}>
-                                        {p.category} - {p.name} ({p.code})
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                         </Select>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label>Nomor Pelanggan (HP / ID Pel)</Label>
-                        <Input 
-                            className="rounded-xl"
-                            placeholder="0812xxxx / 1234xxxx"
-                            value={newTrx.customerNumber}
-                            onChange={(e) => setNewTrx({...newTrx, customerNumber: e.target.value})} 
-                        />
-                    </div>
-
-                    {selectedProduct && (
-                         <div className="bg-slate-50 p-4 rounded-xl space-y-1 text-sm border">
-                            <div className="flex justify-between">
-                                <span className="text-muted-foreground">Harga Jual:</span>
-                                <span className="font-semibold text-indigo-600">{formatCurrency(selectedProduct.sellingPrice)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-muted-foreground">Kode:</span>
-                                <span className="font-mono">{selectedProduct.code}</span>
-                            </div>
-                         </div>
-                    )}
-
-                    <div className="pt-4 flex justify-end gap-2">
-                        <Button type="button" variant="outline" className="rounded-xl" onClick={() => setIsCreateDialogOpen(false)}>Batal</Button>
-                        <Button type="submit" className="rounded-xl bg-indigo-600 hover:bg-indigo-700" disabled={isSubmitting}>
-                            {isSubmitting ? 'Memproses...' : 'Kirim Transaksi'}
-                        </Button>
-                    </div>
-                </form>
-            </DialogContent>
-        </Dialog>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold font-sans tracking-tight">Transaksi</h1>
+        <p className="text-muted-foreground mt-1 text-sm hidden md:block">
+          Pantau dan kelola semua transaksi
+        </p>
       </div>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="rounded-2xl">
-              <DialogHeader>
-                  <DialogTitle>Edit Transaksi {editingTrx?.transactionCode}</DialogTitle>
-                  <DialogDescription>
-                      Ubah status transaksi. Hati-hati, perubahan status akan mempengaruhi saldo user.
-                  </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleUpdate} className="space-y-4">
-                  <div className="space-y-2">
-                       <Label>Status</Label>
-                       <Select value={editStatus} onValueChange={setEditStatus}>
-                           <SelectTrigger className="rounded-xl"><SelectValue /></SelectTrigger>
-                           <SelectContent>
-                               <SelectItem value="PENDING">Pending</SelectItem>
-                               <SelectItem value="SUCCESS">Sukses</SelectItem>
-                               <SelectItem value="FAILED">Gagal</SelectItem>
-                           </SelectContent>
-                       </Select>
-                  </div>
-                  <div className="space-y-2">
-                      <Label>Pesan Error (Opsional)</Label>
-                      <Textarea 
-                        className="rounded-xl"
-                        placeholder="Contoh: Nomor pelanggan salah"
-                        value={editErrorMessage}
-                        onChange={(e) => setEditErrorMessage(e.target.value)}
-                      />
-                  </div>
-                  <div className="pt-4 flex justify-end gap-2">
-                      <Button variant="outline" className="rounded-xl" type="button" onClick={() => setIsDialogOpen(false)}>Batal</Button>
-                      <Button type="submit" className="rounded-xl bg-indigo-600 hover:bg-indigo-700" disabled={isSubmitting}>
-                          {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
-                      </Button>
-                  </div>
-              </form>
-          </DialogContent>
-      </Dialog>
 
       <Card className="border-none shadow-none bg-transparent">
         <CardContent className="p-0">
-            {/* Filter Bar */}
+            {/* Edit Transaction Dialog */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent className="rounded-2xl">
+                    <DialogHeader>
+                        <DialogTitle>Edit Transaksi {editingTrx?.transactionCode}</DialogTitle>
+                        <DialogDescription>
+                            Ubah status transaksi. Hati-hati, perubahan status akan mempengaruhi saldo user.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleUpdate} className="space-y-4">
+                        <div className="space-y-2">
+                             <Label>Status</Label>
+                             <Select value={editStatus} onValueChange={setEditStatus}>
+                                 <SelectTrigger className="rounded-xl h-11"><SelectValue /></SelectTrigger>
+                                 <SelectContent>
+                                     <SelectItem value="PENDING">Pending</SelectItem>
+                                     <SelectItem value="SUCCESS">Sukses</SelectItem>
+                                     <SelectItem value="FAILED">Gagal</SelectItem>
+                                 </SelectContent>
+                             </Select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Pesan Error (Opsional)</Label>
+                            <Textarea 
+                              className="rounded-xl"
+                              placeholder="Contoh: Nomor pelanggan salah"
+                              value={editErrorMessage}
+                              onChange={(e) => setEditErrorMessage(e.target.value)}
+                            />
+                        </div>
+                        <div className="pt-4 flex flex-col gap-2">
+                            <Button type="submit" className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 h-11 font-bold" disabled={isSubmitting}>
+                                {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                            </Button>
+                            <Button variant="outline" className="w-full rounded-xl h-11 font-bold" type="button" onClick={() => setIsDialogOpen(false)}>Batal</Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* Action Bar */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
-                <div className="flex-1 relative">
+                {/* Action Button - Large on Mobile, Above Search */}
+                <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button className="w-full sm:w-auto h-12 sm:h-auto gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none font-bold text-base sm:text-sm order-first sm:order-last px-6">
+                            <Plus className="h-5 w-5 sm:h-4 sm:w-4" />
+                            <span>Buat Transaksi Baru</span>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md rounded-2xl">
+                        <DialogHeader>
+                            <DialogTitle>Buat Transaksi Baru</DialogTitle>
+                            <DialogDescription>Input manual transaksi PPOB</DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleCreate} className="space-y-4 pt-2">
+                            <div className="space-y-2">
+                                <Label>Tanggal Transaksi</Label>
+                                <Input 
+                                    type="date"
+                                    className="rounded-xl h-11"
+                                    value={newTrx.date}
+                                    onChange={(e) => setNewTrx({...newTrx, date: e.target.value})} 
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                 <Label>Produk</Label>
+                                 <Select 
+                                    value={newTrx.productId} 
+                                    onValueChange={(val) => {
+                                        setNewTrx({...newTrx, productId: val});
+                                        const prod = products.find(p => p.id === val);
+                                        setSelectedProduct(prod || null);
+                                    }}
+                                 >
+                                    <SelectTrigger className="rounded-xl h-11">
+                                        <SelectValue placeholder="Pilih Produk..." />
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-[200px]">
+                                        {products.map((p) => (
+                                            <SelectItem key={p.id} value={p.id}>
+                                                {p.category} - {p.name} ({p.code})
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                 </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>Nomor Pelanggan (HP / ID Pel)</Label>
+                                <Input 
+                                    className="rounded-xl h-11"
+                                    placeholder="0812xxxx / 1234xxxx"
+                                    value={newTrx.customerNumber}
+                                    onChange={(e) => setNewTrx({...newTrx, customerNumber: e.target.value})} 
+                                />
+                            </div>
+
+                            {selectedProduct && (
+                                 <div className="bg-slate-50 p-4 rounded-xl space-y-1 text-sm border dark:bg-zinc-800/40 dark:border-zinc-800">
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Harga Jual:</span>
+                                        <span className="font-semibold text-indigo-600">{formatCurrency(selectedProduct.sellingPrice)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-muted-foreground">Kode:</span>
+                                        <span className="font-mono">{selectedProduct.code}</span>
+                                    </div>
+                                 </div>
+                            )}
+
+                            <div className="pt-4 flex flex-col gap-2">
+                                <Button type="submit" className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 h-11 font-bold" disabled={isSubmitting}>
+                                    {isSubmitting ? 'Memproses...' : 'Kirim Transaksi'}
+                                </Button>
+                                <Button type="button" variant="ghost" className="w-full rounded-xl h-11 font-bold text-zinc-400" onClick={() => setIsCreateDialogOpen(false)}>Batal</Button>
+                            </div>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+
+                <div className="flex-1 relative order-2 sm:order-first">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
                         placeholder="Cari Kode TRX atau No HP..." 
-                        className="pl-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
+                        className="pl-10 h-12 sm:h-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && fetchTransactions()} 
                     />
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 order-3 sm:order-2">
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                        <SelectTrigger className="w-[140px] rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
+                        <SelectTrigger className="basis-2/3 sm:w-[140px] h-12 sm:h-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
                             <SelectValue placeholder="Status" />
                         </SelectTrigger>
                         <SelectContent>
@@ -380,11 +379,12 @@ export default function TransactionsPage() {
                             <SelectItem value="FAILED">Gagal</SelectItem>
                         </SelectContent>
                     </Select>
-                    <Button variant="outline" onClick={fetchTransactions} className="rounded-xl bg-white dark:bg-zinc-900 border-zinc-200">
+                    <Button variant="outline" onClick={fetchTransactions} className="basis-1/3 sm:w-10 h-12 sm:h-10 rounded-xl bg-white dark:bg-zinc-900 border-zinc-200">
                         <RefreshCw className="h-4 w-4" />
                     </Button>
                 </div>
             </div>
+
 
             {/* Desktop Table View (Hidden on Mobile) */}
             <div className="hidden md:block rounded-2xl border bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">

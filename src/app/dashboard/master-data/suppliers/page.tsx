@@ -166,137 +166,138 @@ export default function SuppliersPage() {
 
   return (
     <div className="space-y-6 lg:space-y-8 pb-32 lg:pb-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-1 lg:px-0">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">Manajemen Supplier</h1>
-          <p className="text-xs lg:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Kelola data mitra penyedia layanan PPOB Anda
-          </p>
-        </div>
-
-        <Dialog open={isDialogOpen} onOpenChange={(open) => {
-            setIsDialogOpen(open);
-            if (!open) resetForm();
-        }}>
-            <DialogTrigger asChild>
-                <Button className="w-full sm:w-auto gap-2 rounded-2xl h-11 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100 dark:shadow-none font-black transition-all active:scale-95">
-                    <Plus className="h-4 w-4" />
-                    <span>Supplier Baru</span>
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md rounded-4xl border-none shadow-2xl p-6 lg:p-8">
-                <DialogHeader>
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center mb-4">
-                        <Truck className="h-6 w-6 text-indigo-600" />
-                    </div>
-                    <DialogTitle className="text-xl font-black tracking-tight">{editingId ? 'Edit Data Supplier' : 'Supplier Baru'}</DialogTitle>
-                    <DialogDescription className="text-sm font-medium">
-                        Masukkan rincian informasi partner bisnis Anda.
-                    </DialogDescription>
-                </DialogHeader>
-                 <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2 col-span-2 sm:col-span-1">
-                            <Label htmlFor="code" className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Kode Supplier</Label>
-                            <Input 
-                                id="code" 
-                                className="rounded-xl bg-zinc-50 dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500 font-bold h-11"
-                                placeholder="DIGIFLAZZ"
-                                value={formData.code}
-                                onChange={(e) => setFormData({...formData, code: e.target.value.toUpperCase()})}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2 col-span-2 sm:col-span-1">
-                            <Label htmlFor="name" className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Nama Perusahaan</Label>
-                            <Input 
-                                id="name" 
-                                className="rounded-xl bg-zinc-50 dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500 font-bold h-11"
-                                placeholder="PT. Digital Flazz"
-                                value={formData.name}
-                                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="contact" className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Kontak Person / WA</Label>
-                        <Input 
-                            id="contact" 
-                            className="rounded-xl bg-zinc-50 dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500 font-bold h-11"
-                            placeholder="0812-3456-7890"
-                            value={formData.contact}
-                            onChange={(e) => setFormData({...formData, contact: e.target.value})}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="address" className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Alamat Kantor</Label>
-                        <Input 
-                            id="address" 
-                            className="rounded-xl bg-zinc-50 dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500 font-bold h-11"
-                            placeholder="Jakarta, Indonesia"
-                            value={formData.address}
-                            onChange={(e) => setFormData({...formData, address: e.target.value})}
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-between p-4 rounded-2xl border border-zinc-100 bg-zinc-50 dark:bg-zinc-950/50 dark:border-zinc-800">
-                        <div className="space-y-0.5">
-                            <Label htmlFor="isActive" className="text-sm font-black">Status Kerjasama</Label>
-                            <p className="text-[10px] text-zinc-400 font-medium">
-                                {formData.isActive ? 'Aktif - Produk dapat digunakan' : 'Nonaktif - Produk disembunyikan'}
-                            </p>
-                        </div>
-                        <Switch 
-                            id="isActive"
-                            checked={formData.isActive}
-                            onCheckedChange={(checked) => setFormData({...formData, isActive: checked})}
-                        />
-                    </div>
-                
-                    <div className="flex flex-col gap-2 mt-6">
-                        <Button type="submit" className="w-full rounded-2xl h-12 font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100 dark:shadow-none" disabled={isSubmitting}>
-                            {isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Daftarkan Supplier')}
-                        </Button>
-                        <Button 
-                            type="button" 
-                            variant="ghost" 
-                            className="w-full rounded-2xl h-11 font-bold text-zinc-400" 
-                            onClick={() => setIsDialogOpen(false)}
-                            disabled={isSubmitting}
-                        >
-                            Batal
-                        </Button>
-                    </div>
-                </form>
-            </DialogContent>
-        </Dialog>
+      <div className="mb-8">
+        <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">Manajemen Supplier</h1>
+        <p className="text-xs lg:text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          Kelola data mitra penyedia layanan PPOB Anda
+        </p>
       </div>
 
        {/* Search & Stats Section */}
-       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 px-1 lg:px-0">
-          <div className="lg:col-span-3">
-             <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
-                <Input
-                    placeholder="Cari berdasarkan nama atau kode supplier..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 w-full h-12 lg:h-14 rounded-2xl lg:rounded-3xl bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 shadow-sm focus:ring-2 focus:ring-indigo-500/20 font-bold transition-all"
-                />
+       <div className="flex flex-col gap-4 px-1 lg:px-0 mb-6">
+          {/* Action Button - Large on Mobile, Above Search */}
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+              setIsDialogOpen(open);
+              if (!open) resetForm();
+          }}>
+              <DialogTrigger asChild>
+                  <Button className="w-full sm:w-auto h-12 sm:h-auto gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100 dark:shadow-none font-black text-base sm:text-sm order-first sm:order-last px-6 transition-all active:scale-95">
+                      <Plus className="h-5 w-5 sm:h-4 sm:w-4" />
+                      <span>Daftarkan Supplier Baru</span>
+                  </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md rounded-4xl border-none shadow-2xl p-6 lg:p-8">
+                  <DialogHeader>
+                      <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/30 flex items-center justify-center mb-4">
+                          <Truck className="h-6 w-6 text-indigo-600" />
+                      </div>
+                      <DialogTitle className="text-xl font-black tracking-tight">{editingId ? 'Edit Data Supplier' : 'Supplier Baru'}</DialogTitle>
+                      <DialogDescription className="text-sm font-medium">
+                          Masukkan rincian informasi partner bisnis Anda.
+                      </DialogDescription>
+                  </DialogHeader>
+                   <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+                      <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2 col-span-2 sm:col-span-1">
+                              <Label htmlFor="code" className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Kode Supplier</Label>
+                              <Input 
+                                  id="code" 
+                                  className="rounded-xl bg-zinc-50 dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500 font-bold h-11"
+                                  placeholder="DIGIFLAZZ"
+                                  value={formData.code}
+                                  onChange={(e) => setFormData({...formData, code: e.target.value.toUpperCase()})}
+                                  required
+                              />
+                          </div>
+                          <div className="space-y-2 col-span-2 sm:col-span-1">
+                              <Label htmlFor="name" className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Nama Perusahaan</Label>
+                              <Input 
+                                  id="name" 
+                                  className="rounded-xl bg-zinc-50 dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500 font-bold h-11"
+                                  placeholder="PT. Digital Flazz"
+                                  value={formData.name}
+                                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                  required
+                              />
+                          </div>
+                      </div>
+
+                      <div className="space-y-2">
+                          <Label htmlFor="contact" className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Kontak Person / WA</Label>
+                          <Input 
+                              id="contact" 
+                              className="rounded-xl bg-zinc-50 dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500 font-bold h-11"
+                              placeholder="0812-3456-7890"
+                              value={formData.contact}
+                              onChange={(e) => setFormData({...formData, contact: e.target.value})}
+                          />
+                      </div>
+
+                      <div className="space-y-2">
+                          <Label htmlFor="address" className="text-[10px] uppercase font-black tracking-widest text-zinc-400">Alamat Kantor</Label>
+                          <Input 
+                              id="address" 
+                              className="rounded-xl bg-zinc-50 dark:bg-zinc-950 border-zinc-100 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500 font-bold h-11"
+                              placeholder="Jakarta, Indonesia"
+                              value={formData.address}
+                              onChange={(e) => setFormData({...formData, address: e.target.value})}
+                          />
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 rounded-2xl border border-zinc-100 bg-zinc-50 dark:bg-zinc-950/50 dark:border-zinc-800">
+                          <div className="space-y-0.5">
+                              <Label htmlFor="isActive" className="text-sm font-black">Status Kerjasama</Label>
+                              <p className="text-[10px] text-zinc-400 font-medium">
+                                  {formData.isActive ? 'Aktif - Produk dapat digunakan' : 'Nonaktif - Produk disembunyikan'}
+                              </p>
+                          </div>
+                          <Switch 
+                              id="isActive"
+                              checked={formData.isActive}
+                              onCheckedChange={(checked) => setFormData({...formData, isActive: checked})}
+                          />
+                      </div>
+                  
+                      <div className="flex flex-col gap-2 mt-6">
+                          <Button type="submit" className="w-full rounded-2xl h-12 font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-100 dark:shadow-none" disabled={isSubmitting}>
+                              {isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Daftarkan Supplier')}
+                          </Button>
+                          <Button 
+                              type="button" 
+                              variant="ghost" 
+                              className="w-full rounded-2xl h-11 font-bold text-zinc-400" 
+                              onClick={() => setIsDialogOpen(false)}
+                              disabled={isSubmitting}
+                          >
+                              Batal
+                          </Button>
+                      </div>
+                  </form>
+              </DialogContent>
+          </Dialog>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+             <div className="lg:col-span-3 order-2 sm:order-first">
+                <div className="relative group">
+                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
+                   <Input
+                       placeholder="Cari berdasarkan nama atau kode supplier..."
+                       value={searchTerm}
+                       onChange={(e) => setSearchTerm(e.target.value)}
+                       className="pl-12 w-full h-12 lg:h-14 rounded-2xl lg:rounded-3xl bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 shadow-sm focus:ring-2 focus:ring-indigo-500/20 font-bold transition-all"
+                   />
+                </div>
              </div>
-          </div>
-          <div className="hidden lg:flex items-center gap-2 p-1 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm">
-             <div className="flex-1 flex flex-col items-center">
-                <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest pt-1">Total</span>
-                <span className="text-lg font-black leading-none pb-1">{filteredSuppliers.length}</span>
+             <div className="flex items-center gap-2 p-1 bg-white dark:bg-zinc-900 rounded-2xl lg:rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm order-3 sm:order-last h-12 lg:h-14">
+                <div className="flex-1 flex flex-col items-center">
+                   <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest pt-1 leading-none mb-0.5">Total</span>
+                   <span className="text-sm lg:text-lg font-black leading-none pb-1">{filteredSuppliers.length}</span>
+                </div>
+                <div className="w-px h-8 bg-zinc-100 dark:bg-zinc-800"></div>
+                <Button variant="outline" size="icon" onClick={fetchSuppliers} className="h-10 w-10 border-none bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-xl">
+                   <RefreshCw className={`h-4 w-4 text-zinc-400 ${isLoading ? 'animate-spin' : ''}`} />
+                </Button>
              </div>
-             <div className="w-px h-8 bg-zinc-100 dark:bg-zinc-800"></div>
-             <Button variant="outline" size="icon" onClick={fetchSuppliers} className="h-10 w-10 border-none bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-2xl">
-                <RefreshCw className={`h-4 w-4 text-zinc-400 ${isLoading ? 'animate-spin' : ''}`} />
-             </Button>
           </div>
        </div>
 

@@ -45,28 +45,38 @@ interface Supplier {
   code: string;
 }
 
-const CATEGORIES = [
-  { value: 'PULSA', label: 'Pulsa', icon: Smartphone },
-  { value: 'PAKET_DATA', label: 'Paket Data', icon: Smartphone },
-  { value: 'PLN_TOKEN', label: 'PLN Token', icon: Zap },
-  { value: 'PLN_NONTOKEN', label: 'PLN Non-Token', icon: Zap },
-  { value: 'PDAM', label: 'PDAM', icon: FileText },
-  { value: 'BPJS', label: 'BPJS', icon: FileText },
-  { value: 'E_WALLET', label: 'E-Wallet', icon: Wallet },
-  { value: 'PULSA_TRANSFER', label: 'Pulsa Transfer', icon: Smartphone },
-  { value: 'VOUCHER_GAME', label: 'Voucher Game', icon: FileText },
-];
+interface Category {
+  id: string;
+  name: string;
+  icon: string | null;
+  isActive: boolean;
+}
+
+const ICON_MAP: Record<string, any> = {
+  Smartphone,
+  Zap,
+  FileText,
+  Wallet,
+  Package,
+};
+
+const DEFAULT_ICON = Package;
+
 
 export default function ProductsPage() {
   const { token } = useAuthStore();
   const [products, setProducts] = useState<Product[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+
 
   // Form state
   const [formData, setFormData] = useState({
@@ -120,10 +130,86 @@ export default function ProductsPage() {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/categories', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await response.json();
+      setCategories(data.categories || []);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
     fetchSuppliers();
+    fetchCategories();
   }, [token, categoryFilter, searchTerm]);
+
+  const handleAddCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCategoryName.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/categories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: newCategoryName.toUpperCase(), icon: 'Package' }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Gagal menambah kategori');
+      }
+
+      toast({
+        title: 'Kategori Ditambahkan',
+        description: `Kategori ${newCategoryName} berhasil ditambahkan`,
+      });
+      setNewCategoryName('');
+      fetchCategories();
+    } catch (error: any) {
+      toast({
+        title: 'Gagal Tambah Kategori',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string, name: string) => {
+    if (!confirm(`Hapus kategori ${name}?`)) return;
+
+    try {
+      const response = await fetch(`/api/categories/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error('Gagal menghapus kategori');
+
+      toast({
+        title: 'Kategori Dihapus',
+        description: `Kategori ${name} berhasil dihapus`,
+      });
+      fetchCategories();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -246,11 +332,13 @@ export default function ProductsPage() {
     }).format(value);
   };
 
-  const getCategoryIcon = (category: string) => {
-    const cat = CATEGORIES.find(c => c.value === category);
-    const Icon = cat?.icon || Package;
+  const getCategoryIcon = (categoryName: string) => {
+    const cat = categories.find(c => c.name === categoryName);
+    const iconName = cat?.icon || 'Package';
+    const Icon = ICON_MAP[iconName] || DEFAULT_ICON;
     return <Icon className="h-4 w-4" />;
   };
+
 
   return (
     <div className="space-y-6 pb-20 lg:pb-0">
@@ -270,10 +358,19 @@ export default function ProductsPage() {
               if (!open) resetForm();
             }}>
               <DialogTrigger asChild>
+                <Button 
+                  onClick={() => setIsCategoryDialogOpen(true)}
+                  variant="outline"
+                  className="w-full sm:w-auto h-12 sm:h-auto gap-2 rounded-xl border-zinc-200 dark:border-zinc-800 font-bold text-base sm:text-sm order-2 sm:order-last px-6"
+                >
+                  <Package className="h-5 w-5 sm:h-4 sm:w-4" />
+                  <span>Kelola Kategori</span>
+                </Button>
                 <Button className="w-full sm:w-auto h-12 sm:h-auto gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none font-bold text-base sm:text-sm order-first sm:order-last px-6">
                   <Plus className="h-5 w-5 sm:h-4 sm:w-4" />
                   <span>Tambah Produk Baru</span>
                 </Button>
+
               </DialogTrigger>
               <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
                 <DialogHeader>
@@ -308,15 +405,19 @@ export default function ProductsPage() {
                           <SelectValue placeholder="Pilih kategori" />
                         </SelectTrigger>
                         <SelectContent>
-                          {CATEGORIES.map((cat) => (
-                            <SelectItem key={cat.value} value={cat.value}>
-                              <div className="flex items-center gap-2">
-                                <cat.icon className="h-4 w-4" />
-                                {cat.label}
-                              </div>
-                            </SelectItem>
-                          ))}
+                          {categories.map((cat) => {
+                            const Icon = ICON_MAP[cat.icon || 'Package'] || DEFAULT_ICON;
+                            return (
+                              <SelectItem key={cat.id} value={cat.name}>
+                                <div className="flex items-center gap-2">
+                                  <Icon className="h-4 w-4" />
+                                  <span className="capitalize">{cat.name.toLowerCase().replace(/_/g, ' ')}</span>
+                                </div>
+                              </SelectItem>
+                            );
+                          })}
                         </SelectContent>
+
                       </Select>
                     </div>
                   </div>
@@ -460,17 +561,21 @@ export default function ProductsPage() {
                 <SelectTrigger className="w-full sm:w-[180px] h-12 sm:h-10 rounded-2xl bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm">
                     <SelectValue placeholder="Kategori" />
                 </SelectTrigger>
-                <SelectContent className="rounded-2xl">
+                 <SelectContent className="rounded-2xl">
                     <SelectItem value="ALL">Semua Kategori</SelectItem>
-                    {CATEGORIES.map((cat) => (
-                    <SelectItem key={cat.value} value={cat.value}>
-                        <div className="flex items-center gap-2">
-                            <cat.icon className="h-4 w-4" />
-                            {cat.label}
-                        </div>
-                    </SelectItem>
-                    ))}
+                    {categories.map((cat) => {
+                      const Icon = ICON_MAP[cat.icon || 'Package'] || DEFAULT_ICON;
+                      return (
+                        <SelectItem key={cat.id} value={cat.name}>
+                          <div className="flex items-center gap-2">
+                              <Icon className="h-4 w-4" />
+                              <span className="capitalize">{cat.name.toLowerCase().replace(/_/g, ' ')}</span>
+                          </div>
+                        </SelectItem>
+                      );
+                    })}
                 </SelectContent>
+
                 </Select>
             </div>
           </div>
@@ -609,6 +714,55 @@ export default function ProductsPage() {
 
         </CardContent>
       </Card>
+
+      {/* Category Management Dialog */}
+      <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+        <DialogContent className="sm:max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Kelola Kategori</DialogTitle>
+            <DialogDescription>
+              Tambah atau hapus kategori produk
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <form onSubmit={handleAddCategory} className="flex gap-2">
+              <Input
+                placeholder="Nama kategori baru..."
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                className="rounded-xl"
+                disabled={isSubmitting}
+              />
+              <Button type="submit" className="rounded-xl bg-indigo-600 hover:bg-indigo-700" disabled={isSubmitting}>
+                {isSubmitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              </Button>
+            </form>
+
+            <div className="max-h-[300px] overflow-y-auto space-y-2 pr-2">
+              {categories.map((cat) => (
+                <div key={cat.id} className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border flex items-center justify-center text-zinc-500">
+                      {getCategoryIcon(cat.name)}
+                    </div>
+                    <span className="font-medium text-sm capitalize">{cat.name.toLowerCase().replace(/_/g, ' ')}</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                    onClick={() => handleDeleteCategory(cat.id, cat.name)}
+                    disabled={isSubmitting}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+

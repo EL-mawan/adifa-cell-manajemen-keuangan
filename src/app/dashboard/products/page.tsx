@@ -100,12 +100,18 @@ export default function ProductsPage() {
       const response = await fetch(`/api/products?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Gagal mengambil data produk');
+      }
+
       const data = await response.json();
       setProducts(data.products || []);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: 'Gagal mengambil data produk',
+        description: error.message || 'Gagal mengambil data produk',
         variant: 'destructive',
       });
     } finally {
@@ -352,200 +358,201 @@ export default function ProductsPage() {
       <Card className="border-none shadow-none bg-transparent">
         <CardContent className="p-0">
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            {/* Action Button - Large on Mobile, Above Search */}
-            <Dialog open={isDialogOpen} onOpenChange={(open) => {
-              setIsDialogOpen(open);
-              if (!open) resetForm();
-            }}>
-              <DialogTrigger asChild>
-                <Button 
-                  onClick={() => setIsCategoryDialogOpen(true)}
-                  variant="outline"
-                  className="w-full sm:w-auto h-12 sm:h-auto gap-2 rounded-xl border-zinc-200 dark:border-zinc-800 font-bold text-base sm:text-sm order-2 sm:order-last px-6"
-                >
-                  <Package className="h-5 w-5 sm:h-4 sm:w-4" />
-                  <span>Kelola Kategori</span>
-                </Button>
-                <Button className="w-full sm:w-auto h-12 sm:h-auto gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none font-bold text-base sm:text-sm order-first sm:order-last px-6">
-                  <Plus className="h-5 w-5 sm:h-4 sm:w-4" />
-                  <span>Tambah Produk Baru</span>
-                </Button>
+            {/* Action Buttons - Large on Mobile, Above Search */}
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto order-first sm:order-last">
+              <Button 
+                onClick={() => setIsCategoryDialogOpen(true)}
+                variant="outline"
+                className="w-full sm:w-auto h-12 sm:h-auto gap-2 rounded-xl border-zinc-200 dark:border-zinc-800 font-bold text-base sm:text-sm px-6"
+              >
+                <Package className="h-5 w-5 sm:h-4 sm:w-4" />
+                <span>Kelola Kategori</span>
+              </Button>
 
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
-                <DialogHeader>
-                  <DialogTitle>{editingId ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
-                  <DialogDescription>
-                    Masukkan detail produk PPOB baru
-                  </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4 pt-2">
-                  <div className="grid grid-cols-2 gap-4">
+              <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                setIsDialogOpen(open);
+                if (!open) resetForm();
+              }}>
+                <DialogTrigger asChild>
+                  <Button className="w-full sm:w-auto h-12 sm:h-auto gap-2 bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none font-bold text-base sm:text-sm px-6">
+                    <Plus className="h-5 w-5 sm:h-4 sm:w-4" />
+                    <span>Tambah Produk Baru</span>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
+                  <DialogHeader>
+                    <DialogTitle>{editingId ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
+                    <DialogDescription>
+                      Masukkan detail produk PPOB baru
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="code">Kode Produk *</Label>
+                        <Input
+                          className="rounded-xl"
+                          id="code"
+                          placeholder="Contoh: TSEL10"
+                          value={formData.code}
+                          onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                          required
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="category">Kategori *</Label>
+                        <Select
+                          value={formData.category}
+                          onValueChange={(value) => setFormData({ ...formData, category: value })}
+                          required
+                          disabled={isSubmitting}
+                        >
+                          <SelectTrigger id="category" className="rounded-xl">
+                            <SelectValue placeholder="Pilih kategori" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categories.map((cat) => {
+                              const Icon = ICON_MAP[cat.icon || 'Package'] || DEFAULT_ICON;
+                              return (
+                                <SelectItem key={cat.id} value={cat.name}>
+                                  <div className="flex items-center gap-2">
+                                    <Icon className="h-4 w-4" />
+                                    <span className="capitalize">{cat.name.toLowerCase().replace(/_/g, ' ')}</span>
+                                  </div>
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="code">Kode Produk *</Label>
+                      <Label htmlFor="name">Nama Produk *</Label>
                       <Input
                         className="rounded-xl"
-                        id="code"
-                        placeholder="Contoh: TSEL10"
-                        value={formData.code}
-                        onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                        id="name"
+                        placeholder="Contoh: Telkomsel 10.000"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         required
                         disabled={isSubmitting}
                       />
                     </div>
+
                     <div className="space-y-2">
-                      <Label htmlFor="category">Kategori *</Label>
+                      <Label htmlFor="supplier">Supplier *</Label>
                       <Select
-                        value={formData.category}
-                        onValueChange={(value) => setFormData({ ...formData, category: value })}
+                        value={formData.supplierId}
+                        onValueChange={(value) => setFormData({ ...formData, supplierId: value })}
                         required
                         disabled={isSubmitting}
                       >
-                        <SelectTrigger id="category" className="rounded-xl">
-                          <SelectValue placeholder="Pilih kategori" />
+                        <SelectTrigger id="supplier" className="rounded-xl">
+                          <SelectValue placeholder="Pilih supplier" />
                         </SelectTrigger>
                         <SelectContent>
-                          {categories.map((cat) => {
-                            const Icon = ICON_MAP[cat.icon || 'Package'] || DEFAULT_ICON;
-                            return (
-                              <SelectItem key={cat.id} value={cat.name}>
-                                <div className="flex items-center gap-2">
-                                  <Icon className="h-4 w-4" />
-                                  <span className="capitalize">{cat.name.toLowerCase().replace(/_/g, ' ')}</span>
-                                </div>
-                              </SelectItem>
-                            );
-                          })}
+                          {suppliers.map((supplier) => (
+                            <SelectItem key={supplier.id} value={supplier.id}>
+                              {supplier.name} ({supplier.code})
+                            </SelectItem>
+                          ))}
                         </SelectContent>
-
                       </Select>
                     </div>
-                  </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nama Produk *</Label>
-                    <Input
-                      className="rounded-xl"
-                      id="name"
-                      placeholder="Contoh: Telkomsel 10.000"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                      disabled={isSubmitting}
-                    />
-                  </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="basePrice">Harga Modal (Rp) *</Label>
+                        <Input
+                          className="rounded-xl"
+                          id="basePrice"
+                          type="number"
+                          placeholder="10000"
+                          value={formData.basePrice}
+                          onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
+                          min="0"
+                          step="any"
+                          required
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="sellingPrice">Harga Jual (Rp) *</Label>
+                        <Input
+                          className="rounded-xl"
+                          id="sellingPrice"
+                          type="number"
+                          placeholder="10500"
+                          value={formData.sellingPrice}
+                          onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
+                          min="0"
+                          step="any"
+                          required
+                          disabled={isSubmitting}
+                        />
+                      </div>
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="supplier">Supplier *</Label>
-                    <Select
-                      value={formData.supplierId}
-                      onValueChange={(value) => setFormData({ ...formData, supplierId: value })}
-                      required
-                      disabled={isSubmitting}
-                    >
-                      <SelectTrigger id="supplier" className="rounded-xl">
-                        <SelectValue placeholder="Pilih supplier" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {suppliers.map((supplier) => (
-                          <SelectItem key={supplier.id} value={supplier.id}>
-                            {supplier.name} ({supplier.code})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    {/* Preview */}
+                    {formData.basePrice && formData.sellingPrice && (
+                      <div className="bg-muted p-4 rounded-xl space-y-2 text-sm border shadow-sm dark:bg-zinc-800/40">
+                        <p className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 mb-2">
+                          <TrendingUp className="h-4 w-4 text-emerald-500" />
+                          Preview Profit & Total
+                        </p>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Harga Modal:</span>
+                          <span className="font-mono">{formatCurrency(parseFloat(formData.basePrice) || 0)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Harga Jual Dasar:</span>
+                          <span className="font-mono">{formatCurrency(parseFloat(formData.sellingPrice) || 0)}</span>
+                        </div>
+                        <div className="flex justify-between border-b pb-2">
+                          <span className="text-muted-foreground">Fee Adm:</span>
+                          <span className="font-mono text-indigo-600 font-bold">+ {formatCurrency(parseFloat(formData.fee) || 0)}</span>
+                        </div>
+                        <div className="flex justify-between pt-1">
+                          <span className="font-bold">Total Pembayaran:</span>
+                          <span className="font-black text-blue-600">
+                              {formatCurrency((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0))}
+                          </span>
+                        </div>
+                        <div className="flex justify-between font-black text-emerald-600 border-t pt-2 mt-2 bg-emerald-50 dark:bg-emerald-950/20 px-2 rounded-lg py-1">
+                          <span>Net Profit:</span>
+                          <span>
+                            {formatCurrency(
+                              ((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0)) - (parseFloat(formData.basePrice) || 0)
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    )}
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="basePrice">Harga Modal (Rp) *</Label>
-                      <Input
-                        className="rounded-xl"
-                        id="basePrice"
-                        type="number"
-                        placeholder="10000"
-                        value={formData.basePrice}
-                        onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
-                        min="0"
-                        step="any"
-                        required
+                    <div className="flex flex-col gap-2 pt-2">
+                      <Button
+                        type="submit"
+                        className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 h-11 font-bold"
                         disabled={isSubmitting}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="sellingPrice">Harga Jual (Rp) *</Label>
-                      <Input
-                        className="rounded-xl"
-                        id="sellingPrice"
-                        type="number"
-                        placeholder="10500"
-                        value={formData.sellingPrice}
-                        onChange={(e) => setFormData({ ...formData, sellingPrice: e.target.value })}
-                        min="0"
-                        step="any"
-                        required
+                      >
+                        {isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Simpan Produk')}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="w-full rounded-xl h-11 font-bold text-zinc-400 hover:text-zinc-600"
+                        onClick={() => setIsDialogOpen(false)}
                         disabled={isSubmitting}
-                      />
+                      >
+                        Batal
+                      </Button>
                     </div>
-                  </div>
-
-                  {/* Preview */}
-                  {formData.basePrice && formData.sellingPrice && (
-                    <div className="bg-muted p-4 rounded-xl space-y-2 text-sm border shadow-sm dark:bg-zinc-800/40">
-                      <p className="font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-2 mb-2">
-                        <TrendingUp className="h-4 w-4 text-emerald-500" />
-                        Preview Profit & Total
-                      </p>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Harga Modal:</span>
-                        <span className="font-mono">{formatCurrency(parseFloat(formData.basePrice) || 0)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Harga Jual Dasar:</span>
-                        <span className="font-mono">{formatCurrency(parseFloat(formData.sellingPrice) || 0)}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-muted-foreground">Fee Adm:</span>
-                        <span className="font-mono text-indigo-600 font-bold">+ {formatCurrency(parseFloat(formData.fee) || 0)}</span>
-                      </div>
-                      <div className="flex justify-between pt-1">
-                        <span className="font-bold">Total Pembayaran:</span>
-                        <span className="font-black text-blue-600">
-                            {formatCurrency((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0))}
-                        </span>
-                      </div>
-                      <div className="flex justify-between font-black text-emerald-600 border-t pt-2 mt-2 bg-emerald-50 dark:bg-emerald-950/20 px-2 rounded-lg py-1">
-                        <span>Net Profit:</span>
-                        <span>
-                          {formatCurrency(
-                            ((parseFloat(formData.sellingPrice) || 0) + (parseFloat(formData.fee) || 0)) - (parseFloat(formData.basePrice) || 0)
-                          )}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="flex flex-col gap-2 pt-2">
-                    <Button
-                      type="submit"
-                      className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-700 h-11 font-bold"
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Simpan Produk')}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="w-full rounded-xl h-11 font-bold text-zinc-400 hover:text-zinc-600"
-                      onClick={() => setIsDialogOpen(false)}
-                      disabled={isSubmitting}
-                    >
-                      Batal
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
 
             <div className="flex-1 relative order-2 sm:order-first">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -619,7 +626,7 @@ export default function ProductsPage() {
                       <TableCell>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           {getCategoryIcon(product.category)}
-                          <span className="capitalize">{product.category.toLowerCase().replace(/_/g, ' ')}</span>
+                          <span className="capitalize">{(product.category || '').toLowerCase().replace(/_/g, ' ')}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{product.supplier.name}</TableCell>
@@ -679,7 +686,7 @@ export default function ProductsPage() {
                                      <h3 className="font-bold text-zinc-800 dark:text-zinc-100 truncate w-40">{product.name}</h3>
                                      <div className="flex items-center gap-2 text-xs text-zinc-500">
                                         <span className="font-mono bg-zinc-100 px-1 rounded">{product.code}</span>
-                                        <span>• {product.category}</span>
+                                        <span className="capitalize">• {(product.category || '').toLowerCase().replace(/_/g, ' ')}</span>
                                      </div>
                                  </div>
                              </div>

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Lock, Mail, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, Lock, Mail, CheckCircle2, XCircle, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Logo } from '@/components/logo';
 
@@ -65,6 +65,7 @@ export default function LoginPage() {
     type: null,
     message: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -188,14 +189,24 @@ export default function LoginPage() {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-400 group-focus-within:text-indigo-600 transition-colors" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-12 h-14 rounded-2xl bg-zinc-50/50 border-zinc-100 dark:bg-zinc-800/50 dark:border-zinc-800 focus:ring-4 focus:ring-indigo-500/10 transition-all text-base"
+                    className="pl-12 pr-12 h-14 rounded-2xl bg-zinc-50/50 border-zinc-100 dark:bg-zinc-800/50 dark:border-zinc-800 focus:ring-4 focus:ring-indigo-500/10 transition-all text-base"
                     required
                     disabled={isLoading}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isLoading}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-indigo-600 transition-colors focus:outline-none"
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
                 </div>
               </div>
 

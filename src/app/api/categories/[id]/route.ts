@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await verifyAuth(request);
 
@@ -21,10 +21,11 @@ export async function PATCH(
   }
 
   try {
+    const { id } = await params;
     const { name, icon, isActive } = await request.json();
 
     const category = await db.category.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         icon,
@@ -43,7 +44,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await verifyAuth(request);
 
@@ -60,8 +61,9 @@ export async function DELETE(
   }
 
   try {
+    const { id } = await params;
     await db.category.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Kategori berhasil dihapus' });
@@ -72,3 +74,4 @@ export async function DELETE(
     );
   }
 }
+

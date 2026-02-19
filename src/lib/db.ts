@@ -19,8 +19,10 @@ if (tursoUrl) {
   adapter = new PrismaLibSQL(libsql);
 }
 
-export const db =
+const prisma =
   globalForPrisma.prisma ??
   new PrismaClient(adapter ? { adapter } : undefined)
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+export const db = prisma as any; // Cast to any to bypass stubborn IDE sync issues with generated models

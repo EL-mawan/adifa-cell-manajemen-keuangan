@@ -5,8 +5,12 @@ import bcrypt from 'bcryptjs';
 import { generateToken } from '@/lib/jwt';
 
 export async function POST(request: NextRequest) {
+  console.log('Login attempt started...');
   try {
-    const { email, password } = await request.json();
+    const body = await request.json();
+    const { email, password } = body;
+
+    console.log(`Login attempt for email: ${email}`);
 
     if (!email || !password) {
       return NextResponse.json(
@@ -15,9 +19,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
     // Find user by email
     const user = await db.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (!user) {

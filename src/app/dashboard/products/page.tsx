@@ -166,7 +166,7 @@ export default function ProductsPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: newCategoryName.toUpperCase(), icon: 'Package' }),
+        body: JSON.stringify({ name: newCategoryName.trim(), icon: 'Package' }),
       });
 
       if (!response.ok) {
@@ -418,7 +418,7 @@ export default function ProductsPage() {
                                 <SelectItem key={cat.id} value={cat.name}>
                                   <div className="flex items-center gap-2">
                                     <Icon className="h-4 w-4" />
-                                    <span className="capitalize">{cat.name.toLowerCase().replace(/_/g, ' ')}</span>
+                                    <span>{cat.name}</span>
                                   </div>
                                 </SelectItem>
                               );
@@ -573,12 +573,12 @@ export default function ProductsPage() {
                     {categories.map((cat) => {
                       const Icon = ICON_MAP[cat.icon || 'Package'] || DEFAULT_ICON;
                       return (
-                        <SelectItem key={cat.id} value={cat.name}>
-                          <div className="flex items-center gap-2">
-                              <Icon className="h-4 w-4" />
-                              <span className="capitalize">{cat.name.toLowerCase().replace(/_/g, ' ')}</span>
-                          </div>
-                        </SelectItem>
+                                <SelectItem key={cat.id} value={cat.name}>
+                                  <div className="flex items-center gap-2">
+                                      <Icon className="h-4 w-4" />
+                                      <span>{cat.name}</span>
+                                  </div>
+                                </SelectItem>
                       );
                     })}
                 </SelectContent>
@@ -626,7 +626,7 @@ export default function ProductsPage() {
                       <TableCell>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           {getCategoryIcon(product.category)}
-                          <span className="capitalize">{(product.category || '').toLowerCase().replace(/_/g, ' ')}</span>
+                          <span>{product.category}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">{product.supplier.name}</TableCell>
@@ -686,7 +686,7 @@ export default function ProductsPage() {
                                      <h3 className="font-bold text-zinc-800 dark:text-zinc-100 truncate w-40">{product.name}</h3>
                                      <div className="flex items-center gap-2 text-xs text-zinc-500">
                                         <span className="font-mono bg-zinc-100 px-1 rounded">{product.code}</span>
-                                        <span className="capitalize">• {(product.category || '').toLowerCase().replace(/_/g, ' ')}</span>
+                                        <span>• {product.category}</span>
                                      </div>
                                  </div>
                              </div>
@@ -752,7 +752,7 @@ export default function ProductsPage() {
                     <div className="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border flex items-center justify-center text-zinc-500">
                       {getCategoryIcon(cat.name)}
                     </div>
-                    <span className="font-medium text-sm capitalize">{cat.name.toLowerCase().replace(/_/g, ' ')}</span>
+                    <span className="font-medium text-sm">{cat.name}</span>
                   </div>
                   <Button
                     variant="ghost"

@@ -74,7 +74,6 @@ model Category {
   @@index([name])
 }
 
-
 model Transaction {
   id              String   @id @default(cuid())
   transactionCode String   @unique
@@ -89,8 +88,8 @@ model Transaction {
   errorMessage    String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  product         Product  @relation(fields: [productId], references: [id])
   user            User     @relation(fields: [userId], references: [id])
+  product         Product  @relation(fields: [productId], references: [id])
 
   @@index([transactionCode])
   @@index([userId])

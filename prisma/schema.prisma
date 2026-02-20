@@ -66,12 +66,14 @@ model Product {
 model Category {
   id        String   @id @default(cuid())
   name      String   @unique
+  type      String   @default("EXPENSE") // INCOME = saldo bertambah, EXPENSE = saldo berkurang
   icon      String?  @default("Package")
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([name])
+  @@index([type])
 }
 
 model Transaction {

@@ -22,7 +22,15 @@ export async function PATCH(
 
   try {
     const { id } = await params;
-    const { name, icon, isActive } = await request.json();
+    const { name, icon, isActive, type } = await request.json();
+
+    // Validate type if provided
+    if (type && !['INCOME', 'EXPENSE'].includes(type)) {
+      return NextResponse.json(
+        { error: 'Tipe kategori harus INCOME atau EXPENSE' },
+        { status: 400 }
+      );
+    }
 
     const category = await db.category.update({
       where: { id },
@@ -30,6 +38,7 @@ export async function PATCH(
         name,
         icon,
         isActive,
+        type,
       },
     });
 

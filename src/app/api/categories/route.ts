@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { name, icon } = await request.json();
+    const { name, icon, type } = await request.json();
 
     if (!name) {
       return NextResponse.json(
@@ -51,9 +51,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate type
+    const categoryType = type || 'EXPENSE';
+    if (!['INCOME', 'EXPENSE'].includes(categoryType)) {
+      return NextResponse.json(
+        { error: 'Tipe kategori harus INCOME atau EXPENSE' },
+        { status: 400 }
+      );
+    }
+
     const category = await db.category.create({
       data: {
         name,
+        type: categoryType,
         icon: icon || 'Package',
         isActive: true,
       },

@@ -19,7 +19,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { useAuthStore } from '@/lib/store/auth';
 import { toast } from '@/hooks/use-toast';
-import { Plus, RefreshCw, Search, Package, Edit, Trash2, Smartphone, Zap, FileText, Wallet, TrendingUp } from 'lucide-react';
+import { Plus, RefreshCw, Search, Package, Edit, Trash2, Smartphone, Zap, FileText, Wallet, TrendingUp, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -48,6 +48,7 @@ interface Supplier {
 interface Category {
   id: string;
   name: string;
+  type: string; // INCOME or EXPENSE
   icon: string | null;
   isActive: boolean;
 }
@@ -76,6 +77,7 @@ export default function ProductsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryType, setNewCategoryType] = useState<string>('EXPENSE');
 
 
   // Form state
@@ -166,7 +168,11 @@ export default function ProductsPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: newCategoryName.trim(), icon: 'Package' }),
+        body: JSON.stringify({ 
+          name: newCategoryName.trim(), 
+          icon: 'Package',
+          type: newCategoryType,
+        }),
       });
 
       if (!response.ok) {
@@ -176,9 +182,10 @@ export default function ProductsPage() {
 
       toast({
         title: 'Kategori Ditambahkan',
-        description: `Kategori ${newCategoryName} berhasil ditambahkan`,
+        description: `Kategori ${newCategoryName} (${newCategoryType === 'INCOME' ? 'Saldo Masuk' : 'Saldo Keluar'}) berhasil ditambahkan`,
       });
       setNewCategoryName('');
+      setNewCategoryType('EXPENSE');
       fetchCategories();
     } catch (error: any) {
       toast({
@@ -728,21 +735,42 @@ export default function ProductsPage() {
           <DialogHeader>
             <DialogTitle>Kelola Kategori</DialogTitle>
             <DialogDescription>
-              Tambah atau hapus kategori produk
+              Tambah atau hapus kategori produk. Pilih tipe untuk menentukan efek saldo.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
-            <form onSubmit={handleAddCategory} className="flex gap-2">
-              <Input
-                placeholder="Nama kategori baru..."
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                className="rounded-xl"
-                disabled={isSubmitting}
-              />
-              <Button type="submit" className="rounded-xl bg-indigo-600 hover:bg-indigo-700" disabled={isSubmitting}>
-                {isSubmitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-              </Button>
+            <form onSubmit={handleAddCategory} className="space-y-3">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Nama kategori baru..."
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  className="rounded-xl"
+                  disabled={isSubmitting}
+                />
+                <Button type="submit" className="rounded-xl bg-indigo-600 hover:bg-indigo-700" disabled={isSubmitting}>
+                  {isSubmitting ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                </Button>
+              </div>
+              <Select value={newCategoryType} onValueChange={setNewCategoryType}>
+                <SelectTrigger className="rounded-xl h-10">
+                  <SelectValue placeholder="Pilih tipe kategori" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="EXPENSE">
+                    <div className="flex items-center gap-2">
+                      <ArrowDownCircle className="h-4 w-4 text-red-500" />
+                      <span>Saldo Berkurang (Pengeluaran)</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="INCOME">
+                    <div className="flex items-center gap-2">
+                      <ArrowUpCircle className="h-4 w-4 text-emerald-500" />
+                      <span>Saldo Bertambah (Pemasukan)</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </form>
 
             <div className="max-h-[300px] overflow-y-auto space-y-2 pr-2">
@@ -752,7 +780,20 @@ export default function ProductsPage() {
                     <div className="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border flex items-center justify-center text-zinc-500">
                       {getCategoryIcon(cat.name)}
                     </div>
-                    <span className="font-medium text-sm">{cat.name}</span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-sm">{cat.name}</span>
+                      <span className={`text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
+                        cat.type === 'INCOME' 
+                          ? 'text-emerald-600' 
+                          : 'text-red-500'
+                      }`}>
+                        {cat.type === 'INCOME' ? (
+                          <><ArrowUpCircle className="h-3 w-3" /> Saldo Masuk</>
+                        ) : (
+                          <><ArrowDownCircle className="h-3 w-3" /> Saldo Keluar</>
+                        )}
+                      </span>
+                    </div>
                   </div>
                   <Button
                     variant="ghost"

@@ -125,8 +125,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check balance
-    if (user.balance < product.basePrice) {
+    // Look up category type (INCOME or EXPENSE)
+    const category = await db.category.findFirst({
+      where: { name: product.category },
+    });
+    const categoryType = category?.type || 'EXPENSE'; // Default to EXPENSE if category not found
+    const isIncome = categoryType === 'INCOME';
+
+    // Check balance only for EXPENSE transactions
+    if (!isIncome && user.balance < product.basePrice) {
       return NextResponse.json(
         { error: 'Saldo tidak mencukupi' },
         { status: 400 }
@@ -177,10 +184,12 @@ export async function POST(request: NextRequest) {
     // For demo purposes, we'll simulate success
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Verify user balance again from DB fresh
-    const freshUser = await db.user.findUnique({ where: { id: user.id } });
-    if (!freshUser || freshUser.balance < product.basePrice) {
-      return NextResponse.json({ error: 'Saldo tidak mencukupi' }, { status: 400 });
+    // Verify user balance again from DB fresh (only for EXPENSE)
+    if (!isIncome) {
+      const freshUser = await db.user.findUnique({ where: { id: user.id } });
+      if (!freshUser || freshUser.balance < product.basePrice) {
+        return NextResponse.json({ error: 'Saldo tidak mencukupi' }, { status: 400 });
+      }
     }
 
     // Update transaction status to SUCCESS
@@ -193,23 +202,34 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Deduct balance atomically
-    const deductedUser = await db.user.update({
+    // Update balance based on category type
+    // INCOME (e.g. Setor Tunai) -> saldo bertambah (increment)
+    // EXPENSE (e.g. Pulsa, Listrik) -> saldo berkurang (decrement)
+    const updatedUser = await db.user.update({
       where: { id: user.id },
-      data: { balance: { decrement: product.basePrice } },
+      data: {
+        balance: isIncome
+          ? { increment: product.basePrice }
+          : { decrement: product.basePrice },
+      },
     });
 
-    const newBalance = deductedUser.balance;
+    const newBalance = updatedUser.balance;
+    const balanceBefore = isIncome
+      ? newBalance - product.basePrice
+      : newBalance + product.basePrice;
 
     // Create balance log
     await db.balanceLog.create({
       data: {
         userId: user.id,
-        type: 'TRANSACTION',
+        type: isIncome ? 'DEPOSIT' : 'TRANSACTION',
         amount: product.basePrice,
-        balanceBefore: newBalance + product.basePrice,
+        balanceBefore,
         balanceAfter: newBalance,
-        description: `Transaksi ${product.name} - ${customerNumber}`,
+        description: isIncome
+          ? `Setor Tunai ${product.name} - ${customerNumber}`
+          : `Transaksi ${product.name} - ${customerNumber}`,
         referenceId: transaction.id,
         createdAt,
       },
@@ -257,30 +277,47 @@ export async function DELETE(request: NextRequest) {
 
     // Refund user balance if transaction was success
     if (transaction.status === 'SUCCESS') {
+      // Look up the product to determine the category type
+      const product = await db.product.findUnique({
+        where: { id: transaction.productId },
+      });
+      const category = product ? await db.category.findFirst({
+        where: { name: product.category },
+      }) : null;
+      const isIncome = category?.type === 'INCOME';
+
+      // Reverse the balance change:
+      // - EXPENSE transactions had decremented balance, so we increment (refund)
+      // - INCOME transactions had incremented balance, so we decrement (reverse)
       const updatedUser = await db.user.update({
         where: { id: transaction.userId },
-        data: { balance: { increment: transaction.basePrice } },
+        data: {
+          balance: isIncome
+            ? { decrement: transaction.basePrice }
+            : { increment: transaction.basePrice },
+        },
       });
 
-      // Create a REFUND log instead of just deleting the TRANSACTION log
-      // This provides better traceability
+      // Create a reversal log
       await db.balanceLog.create({
         data: {
           userId: transaction.userId,
           type: 'REFUND',
           amount: transaction.basePrice,
-          balanceBefore: updatedUser.balance - transaction.basePrice,
+          balanceBefore: isIncome
+            ? updatedUser.balance + transaction.basePrice
+            : updatedUser.balance - transaction.basePrice,
           balanceAfter: updatedUser.balance,
-          description: `Refund: Penghapusan transaksi ${transaction.transactionCode}`,
+          description: isIncome
+            ? `Pembatalan Setor Tunai: ${transaction.transactionCode}`
+            : `Refund: Penghapusan transaksi ${transaction.transactionCode}`,
           referenceId: id,
         }
       });
       
-      // Optionally delete the old TRANSACTION log to avoid double count in some reports
-      // but keeping it with a reference is usually better for audit.
-      // For now, we follow the user's request to "relate" it, often meaning "reverse" it.
+      // Delete the old balance log
       await db.balanceLog.deleteMany({
-        where: { referenceId: id, type: 'TRANSACTION' }
+        where: { referenceId: id, type: { in: ['TRANSACTION', 'DEPOSIT'] } }
       });
     }
 
